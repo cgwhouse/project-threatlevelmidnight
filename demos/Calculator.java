@@ -1,26 +1,17 @@
 //package edu.wofford;
 
 public class Calculator {
+	private String[] measurementNames;
 
-    private double length;
-    private double width;
-    private double height;
+    private ArgumentParser parser;
 
+    public Calculator(String[] measurements) {
+		measurementNames = ["length", "width", "height"];
 
-    public Calculator(String len, String wid, String hei){
-        length = convertToDouble(len);
-        width = convertToDouble(wid);
-        height = convertToDouble(hei);
+        parser = new ArgumentParser(measurementNames, measurements);
     }
-
-
-    private double convertToDouble(String stringNumber){
-        return Double.parseDouble(stringNumber);
+	
+	public double calculate() {
+        return Double.parseDouble(parser.getValue("length")) * Double.parseDouble(parser.getValue("width")) * Double.parseDouble(parser.getValue("height"));
     }
-
-    public double calculateVolume(){
-        return length*width*height;
-    }
-
-
 }
