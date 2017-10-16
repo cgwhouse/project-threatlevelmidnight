@@ -1,4 +1,4 @@
-//package edu.wofford;
+package edu.wofford;
 
 public class Calculator {
 	private String[] measurementNames;
