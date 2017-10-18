@@ -3,10 +3,13 @@ package edu.wofford;
 import java.util.*;
 
 public class ArgumentParser {
+    
     private List<String> argumentNames;
 
     private List<String> argumentValues;
-
+    
+    private String programName;
+    
     private void handleError() {
         //    usage: java VolumeCalculator length width height
         //VolumeCalculator.java: error: unrecognized arguments: 43
@@ -22,27 +25,37 @@ public class ArgumentParser {
         }
     }
 
-    public ArgumentParser(String[] names, String[] values) {
+    public ArgumentParser() {
         argumentNames = new ArrayList<String>();
+        
         argumentValues = new ArrayList<String>();
-
-        for (String name : names) {
-            argumentNames.add(name);
-        }
+    }
+    
+    public void setProgramName(String name) {
+        programName = name;
+    }
+    
+    public void setProgramValues(String[] values) {
         for (String value : values) {
             argumentValues.add(value);
         }
-
-        if (argumentNames.size() != argumentValues.size()) {
+        
+        if (argumentNames.size() != 0 && argumentNames.size() != argumentValues.size()) {
+            handleError();
+        }
+    }
+    
+    public void setProgramNames(String[] names) {
+        for (String name : names) {
+            argumentNames.add(name);
+        }
+        
+        if (argumentValues.size() != 0 && argumentValues.size() != argumentNames.size()) {
             handleError();
         }
     }
 
     public String getValue(String valueName) {
         return argumentValues.get(argumentNames.indexOf(valueName));
-    }
-
-    public String getValue(int valuePosition) {
-        return argumentValues.get(valuePosition);
     }
 }
