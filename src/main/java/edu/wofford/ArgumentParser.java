@@ -3,59 +3,68 @@ package edu.wofford;
 import java.util.*;
 
 public class ArgumentParser {
-    
-    private List<String> argumentNames;
 
+    private List<String> argumentNames;
     private List<String> argumentValues;
-    
     private String programName;
-    
-    private void handleError() {
-        //    usage: java VolumeCalculator length width height
-        //VolumeCalculator.java: error: unrecognized arguments: 43
-        String className = new Exception().getStackTrace()[1].getClassName();
-        String badArgs = "";
-        
-        if (argumentNames.size() < argumentValues.size()) {
-            for (String value : argumentValues.subList(argumentNames.size(), argumentValues.size())) {
-                badArgs += value + " ";
-            }
-            System.out.println("usage: java " + className + argumentNames.toString());
-            System.out.println(className + ".java: error: unrecognized arguments: " + badArgs);
-        }
-    }
 
     public ArgumentParser() {
         argumentNames = new ArrayList<String>();
-        
         argumentValues = new ArrayList<String>();
     }
-    
+
     public void setProgramName(String name) {
         programName = name;
     }
-    
+
     public void setProgramValues(String[] values) {
         for (String value : values) {
             argumentValues.add(value);
         }
-        
-        if (argumentNames.size() != 0 && argumentNames.size() != argumentValues.size()) {
-            handleError();
-        }
     }
-    
+
     public void setProgramNames(String[] names) {
         for (String name : names) {
             argumentNames.add(name);
-        }
-        
-        if (argumentValues.size() != 0 && argumentValues.size() != argumentNames.size()) {
-            handleError();
         }
     }
 
     public String getValue(String valueName) {
         return argumentValues.get(argumentNames.indexOf(valueName));
+    }
+
+    private void handleError() {
+        //    usage: java VolumeCalculator                      length width height
+        //VolumeCalculator.java: error: unrecognized arguments: 5      7     9       43
+
+        // usage: java VolumeCalculator length width height
+        // VolumeCalculator.java: error: the following arguments are required: height
+    
+        String badArgs = "";
+        String message = "usage: java " + programName + " " + makeString(argumentNames) + "\n";
+        message += programName + ".java: error: ";
+
+        if (argumentNames.size() < argumentValues.size()) {
+            message += "unrecognized arguments: ";
+            for (String value : argumentValues.subList(argumentNames.size(), argumentValues.size())) {
+                badArgs += value + " ";
+            }
+        } else if(argumentNames.size() > argumentValues.size()) {
+            message += "the following arguments are required: ";
+            for (String name: argumentNames.subList(argumentValues.size(), argumentNames.size())) {
+                badArgs += name + " ";
+            }
+        }
+        message += badArgs.trim();
+
+        throw new ArgumentException(message);
+    }
+
+    private String makeString(List<String> list) {
+        String result = "";
+        for (String item: list) {
+            result += item + " ";
+        }
+        return result.trim();
     }
 }
