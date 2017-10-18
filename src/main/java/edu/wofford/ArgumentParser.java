@@ -34,12 +34,6 @@ public class ArgumentParser {
     }
 
     private void handleError() {
-        //    usage: java VolumeCalculator                      length width height
-        //VolumeCalculator.java: error: unrecognized arguments: 5      7     9       43
-
-        // usage: java VolumeCalculator length width height
-        // VolumeCalculator.java: error: the following arguments are required: height
-    
         String badArgs = "";
         String message = "usage: java " + programName + " " + makeString(argumentNames) + "\n";
         message += programName + ".java: error: ";
@@ -49,9 +43,9 @@ public class ArgumentParser {
             for (String value : argumentValues.subList(argumentNames.size(), argumentValues.size())) {
                 badArgs += value + " ";
             }
-        } else if(argumentNames.size() > argumentValues.size()) {
+        } else if (argumentNames.size() > argumentValues.size()) {
             message += "the following arguments are required: ";
-            for (String name: argumentNames.subList(argumentValues.size(), argumentNames.size())) {
+            for (String name : argumentNames.subList(argumentValues.size(), argumentNames.size())) {
                 badArgs += name + " ";
             }
         }
@@ -62,7 +56,7 @@ public class ArgumentParser {
 
     private String makeString(List<String> list) {
         String result = "";
-        for (String item: list) {
+        for (String item : list) {
             result += item + " ";
         }
         return result.trim();
