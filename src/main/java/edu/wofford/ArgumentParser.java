@@ -13,6 +13,7 @@ public class ArgumentParser {
     public ArgumentParser() {
         argumentNames = new ArrayList<String>();
         argumentValues = new ArrayList<String>();
+        argumentDescriptions = new ArrayList<String>();
     }
 
     public void setProgramName(String name) {
@@ -31,36 +32,36 @@ public class ArgumentParser {
     
     public void setArgumentDescriptions(String[] descriptions) {
         for (String description: descriptions) {
-            if (description.equals("-h")) {
-                handleError();
-            }
-            
             argumentDescriptions.add(description);
         }
     }
 
     public void setProgramValues(String[] values) {
         for (String value : values) {
+            if (value.equals("-h")) {
+                handleError("Help");
+            }
+            
             argumentValues.add(value);
         }
     }
 
     public String getValue(String valueName) {
         if ((argumentNames.size() == 0 || argumentValues.size() == 0) || (argumentValues.size() != argumentNames.size())) {
-            handleError();
+            handleError("Error");
         }
         
         return argumentValues.get(argumentNames.indexOf(valueName));
     }
 
-    private void handleError() {
+    private void handleError(String messageType) {
         String message = "usage: java " + programName + " " + makeString(argumentNames) + "\n";
 
-        if (argumentValues.contains("-h")) {
+        if (messageType.equals("Help")) {
             String decrArgs = "positional arguments:\n";
             message += programDescription + "\n";
             for (String description : argumentDescriptions) {
-                decrArgs += "\t" + description + "\n";
+                decrArgs += "   " + description + "\n";
             }
             message += decrArgs.trim();
         }
