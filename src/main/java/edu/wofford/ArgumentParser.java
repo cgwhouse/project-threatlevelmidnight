@@ -23,12 +23,6 @@ public class ArgumentParser {
         programDescription = description;
     }
 
-    public void setProgramValues(String[] values) {
-        for (String value : values) {
-            argumentValues.add(value);
-        }
-    }
-
     public void setProgramNames(String[] names) {
         for (String name : names) {
             argumentNames.add(name);
@@ -37,7 +31,17 @@ public class ArgumentParser {
     
     public void setArgumentDescriptions(String[] descriptions) {
         for (String description: descriptions) {
+            if (description.equals("-h")) {
+                handleError();
+            }
+            
             argumentDescriptions.add(description);
+        }
+    }
+
+    public void setProgramValues(String[] values) {
+        for (String value : values) {
+            argumentValues.add(value);
         }
     }
 
@@ -50,22 +54,32 @@ public class ArgumentParser {
     }
 
     private void handleError() {
-        String badArgs = "";
         String message = "usage: java " + programName + " " + makeString(argumentNames) + "\n";
-        message += programName + ".java: error: ";
 
-        if (argumentNames.size() < argumentValues.size()) {
-            message += "unrecognized arguments: ";
-            for (String value : argumentValues.subList(argumentNames.size(), argumentValues.size())) {
-                badArgs += value + " ";
+        if (argumentValues.contains("-h")) {
+            String decrArgs = "positional arguments:\n";
+            message += programDescription + "\n";
+            for (String description : argumentDescriptions) {
+                decrArgs += "\t" + description + "\n";
             }
-        } else if (argumentNames.size() > argumentValues.size()) {
-            message += "the following arguments are required: ";
-            for (String name : argumentNames.subList(argumentValues.size(), argumentNames.size())) {
-                badArgs += name + " ";
-            }
+            message += decrArgs.trim();
         }
-        message += badArgs.trim();
+        else {
+            String badArgs = "";
+            message += programName + ".java: error: ";
+            if (argumentNames.size() < argumentValues.size()) {
+                message += "unrecognized arguments: ";
+                for (String value : argumentValues.subList(argumentNames.size(), argumentValues.size())) {
+                    badArgs += value + " ";
+                }
+            } else if (argumentNames.size() > argumentValues.size()) {
+                message += "the following arguments are required: ";
+                for (String name : argumentNames.subList(argumentValues.size(), argumentNames.size())) {
+                    badArgs += name + " ";
+                }
+            }
+            message += badArgs.trim();
+        }
 
         throw new ArgumentException(message);
     }
