@@ -30,6 +30,10 @@ public class ArgumentParser {
     }
 
     public String getValue(String valueName) {
+        if (argumentNames.size() != 0 && argumentValues.size() != 0 && argumentValues.size() != argumentNames.size()) {
+            handleError();
+        }
+        
         return argumentValues.get(argumentNames.indexOf(valueName));
     }
 
