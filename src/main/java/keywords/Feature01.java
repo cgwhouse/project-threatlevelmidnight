@@ -7,9 +7,9 @@ public class Feature01 {
 	ArgumentParser absurdParser;
 
 	public void startProgramWithArguments(String[] args) {
-		ArgumentParser parser = new ArgumentParser();
+		parser = new ArgumentParser();
 		String[] names = { "length", "width", "height" };
-		// parser.setProgramName("VolumeCalculator");
+		parser.setProgramName("VolumeCalculator");
 		parser.setProgramNames(names);
 		parser.setProgramValues(args);
 	}
@@ -27,17 +27,17 @@ public class Feature01 {
 	}
 
 	public String getProgramOutput() {
-		double d = Double.parseDouble(parser.getValue("length")) * Double.parseDouble(parser.getValue("width"))
+		try {
+		Double d = Double.parseDouble(parser.getValue("length")) * Double.parseDouble(parser.getValue("width"))
 				* Double.parseDouble(parser.getValue("height"));
-		return Double.toString(d);
+		return Integer.toString(d.intValue());
+		} catch (ArgumentException e) {
+			return e.getMessage();
+		}
 	}
 
 	public void startAbsurdProgramWithArguments(String[] args) {
 		absurdParser = new ArgumentParser();
-		// String[] names = { "length", "width", "height" };
-		// parser.setProgramName("VolumeCalculator");
-		// parser.setProgramNames(names);
-		// parser.setProgramValues(args);
 		String[] names = { "pet", "number", "rainy", "bathrooms" };
 		absurdParser.setProgramNames(names);
 		absurdParser.setProgramValues(args);
