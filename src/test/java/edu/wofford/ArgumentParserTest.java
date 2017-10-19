@@ -7,38 +7,27 @@ import static org.junit.Assert.*;
 public class ArgumentParserTest {
 	private ArgumentParser parser;
 
-	// private	String[] argumentNames = {"length", "width", "height"};
-
-	// private	String[] argumentValues = {"7", "5", "2"};
-    
-    // @Before
-    // public void setUp() {
-		// parser = new ArgumentParser(argumentNames, argumentValues);
-    // }
-    
-	@Test
+	@Test(expected = ArgumentException.class)
 	public void testInitialParserIsCorrect() {
+        parser = new ArgumentParser();
+    
+		parser.getValue("height");
+	}
+    
+    @Test()
+    public void testGetValueWorks() {
         String[] argumentNames = {"length", "width", "height"};
 
         String[] argumentValues = {"7", "5", "2"};
         
-        parser = new ArgumentParser(argumentNames, argumentValues);
+        parser = new ArgumentParser();
+        
+        parser.setProgramNames(argumentNames);
     
-		for (int i = 0; i < 3; i++) {
-			assertEquals(argumentValues[i], parser.getValue(i));
-		}
+		parser.setProgramValues(argumentValues);
 		
 		for (int i = 0; i < 3; i++) {
 			assertEquals(argumentValues[i], parser.getValue(argumentNames[i]));
 		}
-	}
-    
-    @Test()
-    public void testInitialParserIsIncorrect() {
-        String[] argumentNames = {"length", "width", "height"};
-
-        String[] argumentValues = {"7", "5", "2", "3"};
-        
-        parser = new ArgumentParser(argumentNames, argumentValues);
     }
 }

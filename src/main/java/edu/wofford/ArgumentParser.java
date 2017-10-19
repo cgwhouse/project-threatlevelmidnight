@@ -6,7 +6,7 @@ public class ArgumentParser {
 
     private List<String> argumentNames;
     private List<String> argumentValues;
-    private String programName;
+    private String programName = "Program name not specified.";
 
     public ArgumentParser() {
         argumentNames = new ArrayList<String>();
@@ -30,7 +30,7 @@ public class ArgumentParser {
     }
 
     public String getValue(String valueName) {
-        if (argumentNames.size() != 0 && argumentValues.size() != 0 && argumentValues.size() != argumentNames.size()) {
+        if ((argumentNames.size() == 0 || argumentValues.size() == 0) || (argumentValues.size() != argumentNames.size())) {
             handleError();
         }
         
