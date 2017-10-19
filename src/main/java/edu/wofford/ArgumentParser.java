@@ -6,7 +6,9 @@ public class ArgumentParser {
 
     private List<String> argumentNames;
     private List<String> argumentValues;
+    private List<String> argumentDescriptions;
     private String programName = "Program name not specified.";
+    private String programDescription = "Program description not specified.";
 
     public ArgumentParser() {
         argumentNames = new ArrayList<String>();
@@ -15,6 +17,10 @@ public class ArgumentParser {
 
     public void setProgramName(String name) {
         programName = name;
+    }
+    
+    public void setProgramDescription(String description) {
+        programDescription = description;
     }
 
     public void setProgramValues(String[] values) {
@@ -26,6 +32,12 @@ public class ArgumentParser {
     public void setProgramNames(String[] names) {
         for (String name : names) {
             argumentNames.add(name);
+        }
+    }
+    
+    public void setArgumentDescriptions(String[] descriptions) {
+        for (String description: descriptions) {
+            argumentDescriptions.add(description);
         }
     }
 
