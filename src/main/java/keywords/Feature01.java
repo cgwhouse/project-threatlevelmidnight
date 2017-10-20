@@ -28,9 +28,9 @@ public class Feature01 {
 
 	public String getProgramOutput() {
 		try {
-		Double d = Double.parseDouble(parser.getValue("length")) * Double.parseDouble(parser.getValue("width"))
-				* Double.parseDouble(parser.getValue("height"));
-		return Integer.toString(d.intValue());
+			Double d = Double.parseDouble(parser.getValue("length")) * Double.parseDouble(parser.getValue("width"))
+					* Double.parseDouble(parser.getValue("height"));
+			return Integer.toString(d.intValue());
 		} catch (ArgumentException e) {
 			return e.getMessage();
 		}

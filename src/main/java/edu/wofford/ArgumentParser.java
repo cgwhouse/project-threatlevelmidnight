@@ -19,7 +19,7 @@ public class ArgumentParser {
     public void setProgramName(String name) {
         programName = name;
     }
-    
+
     public void setProgramDescription(String description) {
         programDescription = description;
     }
@@ -29,9 +29,9 @@ public class ArgumentParser {
             argumentNames.add(name);
         }
     }
-    
+
     public void setArgumentDescriptions(String[] descriptions) {
-        for (String description: descriptions) {
+        for (String description : descriptions) {
             argumentDescriptions.add(description);
         }
     }
@@ -41,16 +41,17 @@ public class ArgumentParser {
             if (value.equals("-h")) {
                 handleError("Help");
             }
-            
+
             argumentValues.add(value);
         }
     }
 
     public String getValue(String valueName) {
-        if ((argumentNames.size() == 0 || argumentValues.size() == 0) || (argumentValues.size() != argumentNames.size())) {
+        if ((argumentNames.size() == 0 || argumentValues.size() == 0)
+                || (argumentValues.size() != argumentNames.size())) {
             handleError("Error");
         }
-        
+
         return argumentValues.get(argumentNames.indexOf(valueName));
     }
 
@@ -64,8 +65,7 @@ public class ArgumentParser {
                 decrArgs += "   " + description + "\n";
             }
             message += decrArgs.trim();
-        }
-        else {
+        } else {
             String badArgs = "";
             message += programName + ".java: error: ";
             if (argumentNames.size() < argumentValues.size()) {
