@@ -72,7 +72,6 @@ public class ArgumentParserTest {
             parser.getValue("height");
         } catch (final ArgumentException error) {
             final String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are required: height";
-
             assertEquals(message, error.getMessage());
         }
     }
@@ -99,8 +98,7 @@ public class ArgumentParserTest {
 
             parser.setProgramValues(argumentValues);
         } catch (final ArgumentException error) {
-            final String message = "usage: java VolumeCalculator length width height\nCalculate the volume of a box.\npositional arguments:\n   length the length of the box (float)\n   width the width of the box (float)\n   height the height of the box (float)";
-
+            final String message = "usage: java VolumeCalculator length width height\nCalculate the volume of a box.\npositional arguments:\nlength the length of the box (float)\nwidth the width of the box (float)\nheight the height of the box (float)";
             assertEquals(message, error.getMessage());
         }
     }

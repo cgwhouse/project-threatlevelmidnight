@@ -62,7 +62,7 @@ public class ArgumentParser {
             String decrArgs = "positional arguments:\n";
             message += programDescription + "\n";
             for (String description : argumentDescriptions) {
-                decrArgs += "   " + description + "\n";
+                decrArgs += description + "\n";
             }
             message += decrArgs.trim();
         } else {
