@@ -4,8 +4,16 @@ public class VolumeCalculator {
 
     public static void main(String[] args) {
         String[] measurementNames = { "length", "width", "height" };
+        String[] argDescriptions = { "the length of the box", 
+									"the width of the box", 
+									"the height of the box"};
 
         ArgumentParser parser = new ArgumentParser();
+        
+        parser.setProgramName("Volume Calculator");
+        parser.setProgramDescription("Calculates the volume of a box");
+        parser.setArgumentDescriptions(argDescriptions);
+        
         parser.setProgramNames(measurementNames);
         parser.setProgramValues(args);
 
