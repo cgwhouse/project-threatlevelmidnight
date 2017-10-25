@@ -5,15 +5,15 @@ import java.util.*;
 public class ArgumentParser {
 
     private List<String> argumentNames;
-    private List<String> argumentValues;
-    private List<String> argumentDescriptions;
-    private String programName = "Program name not specified.";
-    private String programDescription = "Program description not specified.";
+    private Map<String, Argument> argumentMap;
+    private String programName;
+    private String programDescription;
 
     public ArgumentParser() {
         argumentNames = new ArrayList<String>();
-        argumentValues = new ArrayList<String>();
-        argumentDescriptions = new ArrayList<String>();
+        argumentMap = new HashMap<String, Argument>();
+        programName = "Program name not specified.";
+        programDescription = "Program description not specified.";
     }
 
     public void setProgramName(String name) {
@@ -24,20 +24,36 @@ public class ArgumentParser {
         programDescription = description;
     }
 
-    public void setProgramNames(String[] names) {
+    public void setArguments(String[] names) {
         for (String name : names) {
             argumentNames.add(name);
+            Argument arg = new Argument(name);
+            argumentMap.put(name, arg);
         }
     }
 
-    public void setArgumentDescriptions(String[] descriptions) {
-        for (String description : descriptions) {
-            argumentDescriptions.add(description);
-        }
+    public void addArgument(String name) {
+        argumentNames.add(name);
+        Argument arg = new Argument(name);
+        argumentMap.put(name, arg);
+    }
+
+    public void addArgument(Argument arg) {
+        String name = arg.getName();
+        argumentNames.add(name);
+        argumentMap.put(name, arg);
+    }
+
+    public void setArgumentDescription(String name, String description) {
+        Argument arg = argumentMap.get(name);
+        arg.setDescription(description);
+        argumentMap.replace(name, arg);
     }
 
     public void setProgramValues(String[] values) {
-        for (String value : values) {
+        int index = 0;
+        for (String name: argumentNames) {
+            Argument arg = argumentMap.get(name);
             if (value.equals("-h")) {
                 handleError("Help");
             }
