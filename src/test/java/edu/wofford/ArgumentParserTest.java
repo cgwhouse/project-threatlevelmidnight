@@ -32,6 +32,25 @@ public class ArgumentParserTest {
     }
 
     @Test()
+    public void testOptionsForSetArgument() {
+        String[] argumentNames = { "length", "width", "height" };
+        String[] argumentValues = { "7", "5", "2" };
+
+        parser = new ArgumentParser();
+        Argument arg = new Argument(argumentNames[0]);
+
+        parser.setArgument(arg);
+        parser.setArgument(argumentNames[1]);
+        parser.setArgument(argumentNames[2]);
+
+        parser.setArgumentValues(argumentValues);
+
+        for (int i = 0; i < 3; i++) {
+            assertEquals(argumentValues[i], parser.getValue(argumentNames[i]));
+        }
+    }
+
+    @Test()
     public void testTooManyArguments() {
         try {
             String[] argumentNames = { "length", "width", "height" };
