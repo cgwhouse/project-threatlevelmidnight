@@ -8,13 +8,15 @@ public class Feature02 {
 
         public void startProgramWithArguments(String[] args) {
                 String[] argumentNames = { "length", "width", "height" };
-                String[] argumentDescriptions = { "length the length of the box (float)",
-                                "width the width of the box (float)", "height the height of the box (float)" };
+                String[] argumentDescriptions = { "the length of the box (float)", "the width of the box (float)",
+                                "the height of the box (float)" };
                 parser = new ArgumentParser();
                 parser.setProgramName("VolumeCalculator");
                 parser.setProgramDescription("Calculate the volume of a box.");
-                parser.setArgumentDescriptions(argumentDescriptions);
-                parser.setArgumentNames(argumentNames);
+                parser.setArguments(argumentNames);
+                for (int i = 0; i < argumentNames.length; i++) {
+                        parser.setArgumentDescription(argumentNames[i], argumentDescriptions[i]);
+                }
         }
 
         public String getProgramOutput() {

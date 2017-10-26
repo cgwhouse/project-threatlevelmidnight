@@ -5,13 +5,18 @@ import edu.wofford.*;
 public class Feature01 {
 	ArgumentParser parser;
 	ArgumentParser absurdParser;
+	String message = "";
 
 	public void startProgramWithArguments(String[] args) {
 		parser = new ArgumentParser();
 		String[] names = { "length", "width", "height" };
 		parser.setProgramName("VolumeCalculator");
-		parser.setArgumentNames(names);
-		parser.setArgumentValues(args);
+		parser.setArguments(names);
+		try {
+			parser.setArgumentValues(args);
+		} catch (ArgumentException e) {
+			message = e.getMessage();
+		}
 	}
 
 	public String getLength() {
@@ -27,19 +32,19 @@ public class Feature01 {
 	}
 
 	public String getProgramOutput() {
-		try {
+		if (!message.equals("")) {
+			return message;
+		} else {
 			Double d = Double.parseDouble(parser.getValue("length")) * Double.parseDouble(parser.getValue("width"))
 					* Double.parseDouble(parser.getValue("height"));
 			return Integer.toString(d.intValue());
-		} catch (ArgumentException e) {
-			return e.getMessage();
 		}
 	}
 
 	public void startAbsurdProgramWithArguments(String[] args) {
 		absurdParser = new ArgumentParser();
 		String[] names = { "pet", "number", "rainy", "bathrooms" };
-		absurdParser.setArgumentNames(names);
+		absurdParser.setArguments(names);
 		absurdParser.setArgumentValues(args);
 	}
 
