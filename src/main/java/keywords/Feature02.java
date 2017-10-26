@@ -14,13 +14,13 @@ public class Feature02 {
                 parser.setProgramName("VolumeCalculator");
                 parser.setProgramDescription("Calculate the volume of a box.");
                 parser.setArgumentDescriptions(argumentDescriptions);
-                parser.setProgramNames(argumentNames);
+                parser.setArgumentNames(argumentNames);
         }
 
         public String getProgramOutput() {
                 try {
                         String[] argumentValues = { "-h" };
-                        parser.setProgramValues(argumentValues);
+                        parser.setArgumentValues(argumentValues);
                         return "Not passing robot test 2.";
                 } catch (ArgumentException e) {
                         return e.getMessage();

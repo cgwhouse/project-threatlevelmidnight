@@ -10,8 +10,8 @@ public class Feature01 {
 		parser = new ArgumentParser();
 		String[] names = { "length", "width", "height" };
 		parser.setProgramName("VolumeCalculator");
-		parser.setProgramNames(names);
-		parser.setProgramValues(args);
+		parser.setArgumentNames(names);
+		parser.setArgumentValues(args);
 	}
 
 	public String getLength() {
@@ -39,8 +39,8 @@ public class Feature01 {
 	public void startAbsurdProgramWithArguments(String[] args) {
 		absurdParser = new ArgumentParser();
 		String[] names = { "pet", "number", "rainy", "bathrooms" };
-		absurdParser.setProgramNames(names);
-		absurdParser.setProgramValues(args);
+		absurdParser.setArgumentNames(names);
+		absurdParser.setArgumentValues(args);
 	}
 
 	public String getPet() {

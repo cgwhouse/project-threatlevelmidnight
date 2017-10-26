@@ -22,9 +22,9 @@ public class ArgumentParserTest {
 
         parser = new ArgumentParser();
 
-        parser.setProgramNames(argumentNames);
+        parser.setArguments(argumentNames);
 
-        parser.setProgramValues(argumentValues);
+        parser.setArgumentValues(argumentValues);
 
         for (int i = 0; i < 3; i++) {
             assertEquals(argumentValues[i], parser.getValue(argumentNames[i]));
@@ -42,9 +42,9 @@ public class ArgumentParserTest {
 
             parser.setProgramName("VolumeCalculator");
 
-            parser.setProgramNames(argumentNames);
+            parser.setArguments(argumentNames);
 
-            parser.setProgramValues(argumentValues);
+            parser.setArgumentValues(argumentValues);
 
             parser.getValue("height");
         } catch (final ArgumentException error) {
@@ -65,9 +65,9 @@ public class ArgumentParserTest {
 
             parser.setProgramName("VolumeCalculator");
 
-            parser.setProgramNames(argumentNames);
+            parser.setArguments(argumentNames);
 
-            parser.setProgramValues(argumentValues);
+            parser.setArgumentValues(argumentValues);
 
             parser.getValue("height");
         } catch (final ArgumentException error) {
@@ -92,11 +92,13 @@ public class ArgumentParserTest {
 
             parser.setProgramDescription("Calculate the volume of a box.");
 
-            parser.setArgumentDescriptions(argumentDescriptions);
+            parser.setArguments(argumentNames);
+            
+            for (int i = 0; i < argumentNames.length(); i++) {
+                parser.setArgumentDescription(argumentNames[i], argumentDescriptions[i]);
+            }
 
-            parser.setProgramNames(argumentNames);
-
-            parser.setProgramValues(argumentValues);
+            parser.setArgumentValues(argumentValues);
         } catch (final ArgumentException error) {
             final String message = "usage: java VolumeCalculator length width height\nCalculate the volume of a box.\npositional arguments:\nlength the length of the box (float)\nwidth the width of the box (float)\nheight the height of the box (float)";
             assertEquals(message, error.getMessage());
