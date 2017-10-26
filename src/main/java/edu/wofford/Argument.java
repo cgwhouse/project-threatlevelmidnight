@@ -11,6 +11,9 @@ public class Argument {
 
     public Argument(String name) {
         this.name = name;
+        value = "";
+        description = "";
+        type = "";
     }
 
     public void setValue(String value) {

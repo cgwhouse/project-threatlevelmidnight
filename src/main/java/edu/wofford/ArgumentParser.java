@@ -32,13 +32,13 @@ public class ArgumentParser {
         }
     }
 
-    public void addArgument(String name) {
+    public void setArgument(String name) {
         argumentNames.add(name);
         Argument arg = new Argument(name);
         argumentMap.put(name, arg);
     }
 
-    public void addArgument(Argument arg) {
+    public void setArgument(Argument arg) {
         String name = arg.getName();
         argumentNames.add(name);
         argumentMap.put(name, arg);
@@ -50,54 +50,68 @@ public class ArgumentParser {
         argumentMap.replace(name, arg);
     }
 
-    public void setProgramValues(String[] values) {
-        int index = 0;
-        for (String name: argumentNames) {
-            Argument arg = argumentMap.get(name);
-            if (value.equals("-h")) {
-                handleError("Help");
+    public void setArgumentValues(String[] values) {
+        if (values.length != argumentNames.size()) {
+            if (values.length < argumentNames.size()) {
+                handleError(true, makeString(argumentNames.subList(values.length, argumentNames.size())));
+            } else {
+                String error = "";
+                for (int i = argumentNames.size(); i < values.length; i++) {
+                    error += values[i] + " ";
+                }
+                handleError(false, error.trim());
             }
-
-            argumentValues.add(value);
-        }
-    }
-
-    public String getValue(String valueName) {
-        if ((argumentNames.size() == 0 || argumentValues.size() == 0)
-                || (argumentValues.size() != argumentNames.size())) {
-            handleError("Error");
-        }
-
-        return argumentValues.get(argumentNames.indexOf(valueName));
-    }
-
-    private void handleError(String messageType) {
-        String message = "usage: java " + programName + " " + makeString(argumentNames) + "\n";
-
-        if (messageType.equals("Help")) {
-            String decrArgs = "positional arguments:\n";
-            message += programDescription + "\n";
-            for (String description : argumentDescriptions) {
-                decrArgs += description + "\n";
-            }
-            message += decrArgs.trim();
         } else {
-            String badArgs = "";
-            message += programName + ".java: error: ";
-            if (argumentNames.size() < argumentValues.size()) {
-                message += "unrecognized arguments: ";
-                for (String value : argumentValues.subList(argumentNames.size(), argumentValues.size())) {
-                    badArgs += value + " ";
-                }
-            } else if (argumentNames.size() > argumentValues.size()) {
-                message += "the following arguments are required: ";
-                for (String name : argumentNames.subList(argumentValues.size(), argumentNames.size())) {
-                    badArgs += name + " ";
+            int index = 0;
+            for (String name : argumentNames) {
+                Argument arg = argumentMap.get(name);
+                if (values[index].equals("-h")) {
+                    help();
+                } else {
+                    arg.setValue(values[index]);
+                    argumentMap.replace(name, arg);
+                    index++;
                 }
             }
-            message += badArgs.trim();
         }
+    }
 
+    public String getValue(String name) {
+        Argument arg = argumentMap.get(name);
+        return arg.getValue();
+    }
+
+    public String getDescription(String name) {
+        Argument arg = argumentMap.get(name);
+        return arg.getDescription();
+    }
+
+    public String getType(String name) {
+        Argument arg = argumentMap.get(name);
+        return arg.getType();
+    }
+
+    private void handleError(boolean errorType, String error) {
+        String message = makeUsageMessage();
+        message += programName + ".java: error: ";
+        if (errorType) {
+            message += "the following arguments are required: ";
+        } else {
+            message += "unrecognized arguments: ";
+        }
+        message += error;
+        throw new ArgumentException(message);
+    }
+
+    private void help() {
+        String message = makeUsageMessage();
+        String decrArgs = "positional arguments:\n";
+        message += programDescription + "\n";
+        for (String name : argumentNames) {
+            Argument arg = argumentMap.get(name);
+            decrArgs += name + " " + arg.getDescription() + "\n";
+        }
+        message += decrArgs.trim();
         throw new ArgumentException(message);
     }
 
@@ -107,5 +121,9 @@ public class ArgumentParser {
             result += item + " ";
         }
         return result.trim();
+    }
+
+    private String makeUsageMessage() {
+        return "usage: java " + programName + " " + makeString(argumentNames) + "\n";
     }
 }
