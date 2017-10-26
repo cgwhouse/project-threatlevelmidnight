@@ -10,8 +10,8 @@ public class ArgumentParserTest {
     @Test(expected = ArgumentException.class)
     public void testInitialParserIsCorrect() {
         parser = new ArgumentParser();
-
-        parser.getValue("height");
+        String[] args = { "height" };
+        parser.setArgumentValues(args);
     }
 
     @Test()
@@ -81,8 +81,8 @@ public class ArgumentParserTest {
         try {
             String[] argumentNames = { "length", "width", "height" };
 
-            String[] argumentDescriptions = { "length the length of the box (float)",
-                    "width the width of the box (float)", "height the height of the box (float)" };
+            String[] argumentDescriptions = { "the length of the box (float)", "the width of the box (float)",
+                    "the height of the box (float)" };
 
             String[] argumentValues = { "-h" };
 
@@ -93,8 +93,8 @@ public class ArgumentParserTest {
             parser.setProgramDescription("Calculate the volume of a box.");
 
             parser.setArguments(argumentNames);
-            
-            for (int i = 0; i < argumentNames.length(); i++) {
+
+            for (int i = 0; i < argumentNames.length; i++) {
                 parser.setArgumentDescription(argumentNames[i], argumentDescriptions[i]);
             }
 

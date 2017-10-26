@@ -51,6 +51,11 @@ public class ArgumentParser {
     }
 
     public void setArgumentValues(String[] values) {
+        for (int i = 0; i < values.length; i++) {
+            if (values[i].equals("-h")) {
+                help();
+            }
+        }
         if (values.length != argumentNames.size()) {
             if (values.length < argumentNames.size()) {
                 handleError(true, makeString(argumentNames.subList(values.length, argumentNames.size())));
@@ -65,17 +70,13 @@ public class ArgumentParser {
             int index = 0;
             for (String name : argumentNames) {
                 Argument arg = argumentMap.get(name);
-                if (values[index].equals("-h")) {
-                    help();
-                } else {
                     arg.setValue(values[index]);
                     argumentMap.replace(name, arg);
                     index++;
                 }
             }
         }
-    }
-
+    
     public String getValue(String name) {
         Argument arg = argumentMap.get(name);
         return arg.getValue();
