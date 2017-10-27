@@ -50,17 +50,23 @@ public class ArgumentParser {
         argumentMap.replace(name, arg);
     }
 
+    public void setArgumentType(String name, String typeName) {
+        Argument arg = argumentMap.get(name);
+        arg.setType(typeName);
+        argumentMap.replace(name, arg);
+    }
+
     public void setArgumentValues(String[] values) {
         for (int i = 0; i < values.length; i++) {
             if (values[i].equals("-h")) {
                 help();
             }
         }
+        String error = "";
         if (values.length != argumentNames.size()) {
             if (values.length < argumentNames.size()) {
                 handleError(true, makeString(argumentNames.subList(values.length, argumentNames.size())));
             } else {
-                String error = "";
                 for (int i = argumentNames.size(); i < values.length; i++) {
                     error += values[i] + " ";
                 }
@@ -70,9 +76,15 @@ public class ArgumentParser {
             int index = 0;
             for (String name : argumentNames) {
                 Argument arg = argumentMap.get(name);
-                    arg.setValue(values[index]);
-                    argumentMap.replace(name, arg);
-                    index++;
+                    if (legitamiteValue(arg.getType(), values[index])) {
+                        arg.setValue(values[index]);
+                        argumentMap.replace(name, arg);
+                        index++;
+                    }
+                    else {
+                        error = "argument " + name + ": invalid " + arg.getType() + " value: " + values[index];
+                        handleTypeError(error.trim());
+                    }
                 }
             }
         }
@@ -104,6 +116,13 @@ public class ArgumentParser {
         throw new ArgumentException(message);
     }
 
+    private void handleTypeError(String error) {
+        String message = makeUsageMessage();
+        message += programName + ".java: error: ";
+        message += error;
+        throw new ArgumentException(message);
+    }
+
     private void help() {
         String message = makeUsageMessage();
         String decrArgs = "positional arguments:\n";
@@ -127,4 +146,38 @@ public class ArgumentParser {
     private String makeUsageMessage() {
         return "usage: java " + programName + " " + makeString(argumentNames) + "\n";
     }
+
+    private boolean legitamiteValue(String typeName, String value) {
+        try {
+            if (typeName.equals("int")) {
+                Integer.valueOf(value);
+            }
+            else if (typeName.equals("float")) {
+                Float.valueOf(value);
+            }
+            else if (typeName.equals("boolean")) {
+                Boolean.valueOf(value);
+            }
+            else if (typeName.equals("string")) {
+                String.valueOf(value);
+            }
+        }
+        catch (Exception ex){
+            return false;
+        }
+        return true;
+    }
+
+    // private <T> T castValue(String typeName, String value) {
+    //     switch (typeName) {
+    //         case typeName.equals("int"):
+    //             return (T) Integer.valueOf(value);
+    //         case typeName.equals("float"):
+    //             return (T) float.valueOf(value);
+    //         case typeName.equals("boolean"):
+    //             return (T) boolean.valueOf(value);
+    //         default:
+    //             return value;
+    //     }
+    // }
 }

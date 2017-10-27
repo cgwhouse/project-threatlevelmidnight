@@ -123,4 +123,52 @@ public class ArgumentParserTest {
             assertEquals(message, error.getMessage());
         }
     }
+
+    @Test()
+    public void testSetTypeWorks() {
+        String[] argumentNames = { "length", "width", "height" };
+
+        String[] argumentValues = { "7", "5", "2" };
+
+        String[] argumentTypes = { "string", "string", "string"};
+
+        parser = new ArgumentParser();
+
+        parser.setArguments(argumentNames);
+
+        for (int i = 0; i < 3; i++) {
+            parser.setArgumentType(argumentNames[i], argumentTypes[i]);
+        }
+
+        parser.setArgumentValues(argumentValues);
+
+        assertEquals(argumentValues[0], parser.getValue("length"));
+    }
+
+    @Test()
+    public void testSetTypeInvalidType() {
+        try {
+            String[] argumentNames = { "length", "width", "height" };
+
+            String[] argumentValues = { "7", "something", "2" };
+
+            String[] argumentTypes = { "float", "float", "float"};
+
+            parser = new ArgumentParser();
+
+            parser.setArguments(argumentNames);
+
+            parser.setProgramName("VolumeCalculator");
+
+            for (int i = 0; i < 3; i++) {
+                parser.setArgumentType(argumentNames[i], argumentTypes[i]);
+            }
+
+            parser.setArgumentValues(argumentValues);
+
+        } catch (final ArgumentException error) {
+            final String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: argument width: invalid float value: something";
+            assertEquals(message, error.getMessage());
+        }
+    }
 }
