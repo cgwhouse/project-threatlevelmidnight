@@ -60,6 +60,8 @@ public class ArgumentParser {
         for (int i = 0; i < values.length; i++) {
             if (values[i].equals("-h")) {
                 help();
+            } else if (values[i].startsWith("--")) {
+                values = handleDefaults(values);
             }
         }
         String error = "";
@@ -76,19 +78,18 @@ public class ArgumentParser {
             int index = 0;
             for (String name : argumentNames) {
                 Argument arg = argumentMap.get(name);
-                    if (legitamiteValue(arg.getType(), values[index])) {
-                        arg.setValue(values[index]);
-                        argumentMap.replace(name, arg);
-                        index++;
-                    }
-                    else {
-                        error = "argument " + name + ": invalid " + arg.getType() + " value: " + values[index];
-                        handleTypeError(error.trim());
-                    }
+                if (legitamiteValue(arg.getType(), values[index])) {
+                    arg.setValue(values[index]);
+                    argumentMap.replace(name, arg);
+                    index++;
+                } else {
+                    error = "argument " + name + ": invalid " + arg.getType() + " value: " + values[index];
+                    handleTypeError(error.trim());
                 }
             }
         }
-    
+    }
+
     public String getValue(String name) {
         Argument arg = argumentMap.get(name);
         return arg.getValue();
@@ -123,6 +124,21 @@ public class ArgumentParser {
         throw new ArgumentException(message);
     }
 
+    private String[] handleDefaults(String[] values) {
+        List<String> required = new ArrayList<String>();
+        for (int i = 0; i < values.length; i++) {
+            if (!values[i].startsWith("--")) {
+                required.add(values[i]);
+            } else {
+                Argument arg = argumentMap.get(values[i]);
+                arg.setValue(values[i + 1]);
+                argumentMap.replace(values[i], arg);
+                i += 2;
+            }
+        }
+        return required.toArray(new String[0]);
+    }
+
     private void help() {
         String message = makeUsageMessage();
         String decrArgs = "positional arguments:\n";
@@ -151,18 +167,14 @@ public class ArgumentParser {
         try {
             if (typeName.equals("int")) {
                 Integer.valueOf(value);
-            }
-            else if (typeName.equals("float")) {
+            } else if (typeName.equals("float")) {
                 Float.valueOf(value);
-            }
-            else if (typeName.equals("boolean")) {
+            } else if (typeName.equals("boolean")) {
                 Boolean.valueOf(value);
-            }
-            else if (typeName.equals("string")) {
+            } else if (typeName.equals("string")) {
                 String.valueOf(value);
             }
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             return false;
         }
         return true;
