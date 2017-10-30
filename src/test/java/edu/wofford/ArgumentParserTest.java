@@ -171,4 +171,45 @@ public class ArgumentParserTest {
             assertEquals(message, error.getMessage());
         }
     }
+    
+    @Test()
+    public void testDefaultArguments() {
+        String[] argumentNames = { "length", "width", "height" };
+
+        String[] argumentValues = { "7", "5", "2", "--type", "square" };
+        String defaultValue = "ellipsoid";
+
+		Argument arg = new Argument("--type");
+		arg.setValue("ellipsoid");
+		
+        parser = new ArgumentParser();
+
+        parser.setArguments(argumentNames);
+        parser.setArgument(arg);
+        
+        parser.setArgumentValues(argumentValues);
+
+        assertEquals("square", parser.getValue("--type"));
+    }
+    
+    @Test()
+    public void testDefaultArgumentsOutOfOrder() {
+        String[] argumentNames = { "length", "width", "height" };
+
+        String[] argumentValues = { "7", "5", "--type", "square", "2" };
+        String defaultValue = "ellipsoid";
+
+		Argument arg = new Argument("--type");
+		arg.setValue("ellipsoid");
+		
+        parser = new ArgumentParser();
+
+        parser.setArguments(argumentNames);
+        parser.setArgument(arg);
+        
+        parser.setArgumentValues(argumentValues);
+
+        assertEquals("square", parser.getValue("--type"));
+    }
+    
 }
