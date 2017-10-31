@@ -130,7 +130,7 @@ public class ArgumentParserTest {
 
         String[] argumentValues = { "7", "5", "2" };
 
-        String[] argumentTypes = { "string", "string", "string"};
+        String[] argumentTypes = { "string", "string", "string" };
 
         parser = new ArgumentParser();
 
@@ -152,7 +152,7 @@ public class ArgumentParserTest {
 
             String[] argumentValues = { "7", "something", "2" };
 
-            String[] argumentTypes = { "float", "float", "float"};
+            String[] argumentTypes = { "float", "float", "float" };
 
             parser = new ArgumentParser();
 
@@ -171,7 +171,7 @@ public class ArgumentParserTest {
             assertEquals(message, error.getMessage());
         }
     }
-    
+
     @Test()
     public void testDefaultArguments() {
         String[] argumentNames = { "length", "width", "height" };
@@ -179,19 +179,19 @@ public class ArgumentParserTest {
         String[] argumentValues = { "7", "5", "2", "--type", "square" };
         String defaultValue = "ellipsoid";
 
-		Argument arg = new Argument("--type");
-		arg.setValue("ellipsoid");
-		
+        Argument arg = new Argument("--type");
+        arg.setValue("ellipsoid");
+
         parser = new ArgumentParser();
 
         parser.setArguments(argumentNames);
         parser.setArgument(arg);
-        
+
         parser.setArgumentValues(argumentValues);
 
         assertEquals("square", parser.getValue("--type"));
     }
-    
+
     @Test()
     public void testDefaultArgumentsOutOfOrder() {
         String[] argumentNames = { "length", "width", "height" };
@@ -199,17 +199,17 @@ public class ArgumentParserTest {
         String[] argumentValues = { "7", "5", "--type", "square", "2" };
         String defaultValue = "ellipsoid";
 
-		Argument arg = new Argument("--type");
-		arg.setValue("ellipsoid");
-		
+        Argument arg = new Argument("--type");
+        arg.setValue("ellipsoid");
+
         parser = new ArgumentParser();
 
         parser.setArguments(argumentNames);
         parser.setArgument(arg);
-        
+
         parser.setArgumentValues(argumentValues);
 
         assertEquals("square", parser.getValue("--type"));
     }
-    
+
 }
