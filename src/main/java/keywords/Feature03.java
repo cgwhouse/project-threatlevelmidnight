@@ -4,12 +4,11 @@ import edu.wofford.*;
 
 public class Feature03 {
         ArgumentParser parser;
-        ArgumentParser absurdParser;
 
         public void startProgramWithArguments(String[] args) {
                 String[] argumentNames = { "length", "width", "height" };
 
-                String[] argumentTypes = { "float", "float", "float"};
+                String[] argumentTypes = { "float", "float", "float" };
 
                 parser = new ArgumentParser();
 

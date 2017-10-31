@@ -141,17 +141,6 @@ public class ArgumentParser {
         return required.toArray(new String[0]);
     }
 
-    // private int getRequiredArgsCount() {
-    //     int requiredArgsCount = 0;
-    //     for (String name : argumentNames) {
-    //         Argument arg = argumentMap.get(name);
-    //         if (arg.getValue().equals("")) {
-    //             requiredArgsCount += 1;
-    //         }
-    //     }
-    //     return requiredArgsCount;
-    // }
-
     private void help() {
         String message = makeUsageMessage();
         String decrArgs = "positional arguments:\n";
