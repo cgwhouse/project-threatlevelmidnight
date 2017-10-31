@@ -40,7 +40,9 @@ public class ArgumentParser {
 
     public void setArgument(Argument arg) {
         String name = arg.getName();
-        argumentNames.add(name);
+        if (!name.startsWith("--")) {
+            argumentNames.add(name);
+        }
         argumentMap.put(name, arg);
     }
 
@@ -78,7 +80,7 @@ public class ArgumentParser {
             int index = 0;
             for (String name : argumentNames) {
                 Argument arg = argumentMap.get(name);
-                if (legitamiteValue(arg.getType(), values[index])) {
+                if (legitimateValue(arg.getType(), values[index])) {
                     arg.setValue(values[index]);
                     argumentMap.replace(name, arg);
                     index++;
@@ -133,11 +135,22 @@ public class ArgumentParser {
                 Argument arg = argumentMap.get(values[i]);
                 arg.setValue(values[i + 1]);
                 argumentMap.replace(values[i], arg);
-                i += 2;
+                i++;
             }
         }
         return required.toArray(new String[0]);
     }
+
+    // private int getRequiredArgsCount() {
+    //     int requiredArgsCount = 0;
+    //     for (String name : argumentNames) {
+    //         Argument arg = argumentMap.get(name);
+    //         if (arg.getValue().equals("")) {
+    //             requiredArgsCount += 1;
+    //         }
+    //     }
+    //     return requiredArgsCount;
+    // }
 
     private void help() {
         String message = makeUsageMessage();
@@ -163,7 +176,7 @@ public class ArgumentParser {
         return "usage: java " + programName + " " + makeString(argumentNames) + "\n";
     }
 
-    private boolean legitamiteValue(String typeName, String value) {
+    private boolean legitimateValue(String typeName, String value) {
         try {
             if (typeName.equals("int")) {
                 Integer.valueOf(value);
