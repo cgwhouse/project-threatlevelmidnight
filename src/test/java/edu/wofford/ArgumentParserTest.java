@@ -17,13 +17,10 @@ public class ArgumentParserTest {
     @Test()
     public void testGetValueWorks() {
         String[] argumentNames = { "length", "width", "height" };
-
         String[] argumentValues = { "7", "5", "2" };
 
         parser = new ArgumentParser();
-
         parser.setArguments(argumentNames);
-
         parser.setArgumentValues(argumentValues);
 
         for (int i = 0; i < 3; i++) {
@@ -38,7 +35,6 @@ public class ArgumentParserTest {
 
         parser = new ArgumentParser();
         Argument arg = new Argument(argumentNames[0]);
-
         parser.setArgument(arg);
         parser.setArgument(argumentNames[1]);
         parser.setArgument(argumentNames[2]);
@@ -54,15 +50,11 @@ public class ArgumentParserTest {
     public void testTooManyArguments() {
         try {
             String[] argumentNames = { "length", "width", "height" };
-
             String[] argumentValues = { "7", "5", "2", "43" };
 
             parser = new ArgumentParser();
-
             parser.setProgramName("VolumeCalculator");
-
             parser.setArguments(argumentNames);
-
             parser.setArgumentValues(argumentValues);
 
             parser.getValue("height");
@@ -77,15 +69,11 @@ public class ArgumentParserTest {
     public void testTooFewArguments() {
         try {
             String[] argumentNames = { "length", "width", "height" };
-
             String[] argumentValues = { "7", "5" };
 
             parser = new ArgumentParser();
-
             parser.setProgramName("VolumeCalculator");
-
             parser.setArguments(argumentNames);
-
             parser.setArgumentValues(argumentValues);
 
             parser.getValue("height");
@@ -99,18 +87,13 @@ public class ArgumentParserTest {
     public void testHelpArgument() {
         try {
             String[] argumentNames = { "length", "width", "height" };
-
             String[] argumentDescriptions = { "the length of the box (float)", "the width of the box (float)",
                     "the height of the box (float)" };
-
             String[] argumentValues = { "-h" };
 
             parser = new ArgumentParser();
-
             parser.setProgramName("VolumeCalculator");
-
             parser.setProgramDescription("Calculate the volume of a box.");
-
             parser.setArguments(argumentNames);
 
             for (int i = 0; i < argumentNames.length; i++) {
@@ -127,13 +110,10 @@ public class ArgumentParserTest {
     @Test()
     public void testSetTypeWorks() {
         String[] argumentNames = { "length", "width", "height" };
-
         String[] argumentValues = { "7", "5", "2" };
-
         String[] argumentTypes = { "string", "string", "string" };
 
         parser = new ArgumentParser();
-
         parser.setArguments(argumentNames);
 
         for (int i = 0; i < 3; i++) {
@@ -149,15 +129,11 @@ public class ArgumentParserTest {
     public void testSetTypeInvalidType() {
         try {
             String[] argumentNames = { "length", "width", "height" };
-
             String[] argumentValues = { "7", "something", "2" };
-
             String[] argumentTypes = { "float", "float", "float" };
 
             parser = new ArgumentParser();
-
             parser.setArguments(argumentNames);
-
             parser.setProgramName("VolumeCalculator");
 
             for (int i = 0; i < 3; i++) {
@@ -173,43 +149,50 @@ public class ArgumentParserTest {
     }
 
     @Test()
-    public void testDefaultArguments() {
+    public void testDefaultArgumentsAcquiresNewValue() {
         String[] argumentNames = { "length", "width", "height" };
-
         String[] argumentValues = { "7", "5", "2", "--type", "square" };
-        String defaultValue = "ellipsoid";
 
         Argument arg = new Argument("--type");
         arg.setValue("ellipsoid");
 
         parser = new ArgumentParser();
-
         parser.setArguments(argumentNames);
         parser.setArgument(arg);
-
         parser.setArgumentValues(argumentValues);
 
         assertEquals("square", parser.getValue("--type"));
     }
 
     @Test()
-    public void testDefaultArgumentsOutOfOrder() {
+    public void testDefaultArgumentRetainsDefaultValue() {
         String[] argumentNames = { "length", "width", "height" };
-
-        String[] argumentValues = { "7", "5", "--type", "square", "2" };
-        String defaultValue = "ellipsoid";
+        String[] argumentValues = { "7", "5", "2" };
 
         Argument arg = new Argument("--type");
         arg.setValue("ellipsoid");
 
         parser = new ArgumentParser();
-
         parser.setArguments(argumentNames);
         parser.setArgument(arg);
+        parser.setArgumentValues(argumentValues);
 
+        assertEquals("ellipsoid", parser.getValue("--type"));
+    }
+
+    @Test()
+    public void testDefaultArgumentsOutOfOrder() {
+        String[] argumentNames = { "length", "width", "height" };
+        String[] argumentValues = { "7", "5", "--type", "square", "2" };
+
+        Argument arg = new Argument("--type");
+        arg.setValue("ellipsoid");
+
+        parser = new ArgumentParser();
+        parser.setArguments(argumentNames);
+        parser.setArgument(arg);
         parser.setArgumentValues(argumentValues);
 
         assertEquals("square", parser.getValue("--type"));
     }
-
 }
