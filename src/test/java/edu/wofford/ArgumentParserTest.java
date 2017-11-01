@@ -129,8 +129,8 @@ public class ArgumentParserTest {
     public void testSetTypeInvalidType() {
         try {
             String[] argumentNames = { "length", "width", "height" };
-            String[] argumentValues = { "7", "something", "2" };
-            String[] argumentTypes = { "float", "float", "float" };
+            String[] argumentValues = { "true", "something", "2" };
+            String[] argumentTypes = { "boolean", "float", "int" };
 
             parser = new ArgumentParser();
             parser.setArguments(argumentNames);
