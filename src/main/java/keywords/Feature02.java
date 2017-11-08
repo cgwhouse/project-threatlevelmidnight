@@ -10,8 +10,7 @@ public class Feature02 {
                 String[] argumentNames = { "length", "width", "height" };
                 String[] argumentDescriptions = { "the length of the box (float)", "the width of the box (float)",
                                 "the height of the box (float)" };
-                parser = new ArgumentParser();
-                parser.setProgramName("VolumeCalculator");
+                parser = new ArgumentParser("VolumeCalculator");
                 parser.setProgramDescription("Calculate the volume of a box.");
                 parser.setArguments(argumentNames);
                 for (int i = 0; i < argumentNames.length; i++) {

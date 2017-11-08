@@ -6,8 +6,7 @@ public class Feature05 {
     ArgumentParser parser;
 
     public void startProgramWithArguments(String[] args) {
-        parser = new ArgumentParser();
-        parser.setProgramName("VolumeCalculator");
+        parser = new ArgumentParser("VolumeCalculator");
         Argument typeArg = new Argument("--type");
         Argument digitsArg = new Argument("--digits");
         typeArg.setValue("box");

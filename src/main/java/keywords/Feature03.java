@@ -10,11 +10,9 @@ public class Feature03 {
 
                 String[] argumentTypes = { "float", "float", "float" };
 
-                parser = new ArgumentParser();
+                parser = new ArgumentParser("VolumeCalculator");
 
                 parser.setArguments(argumentNames);
-
-                parser.setProgramName("VolumeCalculator");
 
                 for (int i = 0; i < 3; i++) {
                         parser.setArgumentType(argumentNames[i], argumentTypes[i]);

@@ -9,11 +9,11 @@ public class ArgumentParser {
     private String programName;
     private String programDescription;
 
-    public ArgumentParser() {
+    public ArgumentParser(String programName) {
         argumentNames = new ArrayList<String>();
         argumentMap = new HashMap<String, Argument>();
-        programName = "Program name not specified.";
-        programDescription = "Program description not specified.";
+        this.programName = programName;
+        programDescription = "";
     }
 
     public void setProgramName(String name) {
@@ -59,38 +59,56 @@ public class ArgumentParser {
     }
 
     public void setArgumentValues(String[] values) {
-        for (int i = 0; i < values.length; i++) {
-            if (values[i].equals("-h")) {
+        Queue<String> queue = new ArrayDeque<>();
+        for (String s : values) {
+            queue.add(s);
+        }
+
+        int positionalIndex = 0;
+        while (!queue.isEmpty()) {
+            String arg = queue.remove();
+            if (arg.equals("-h")) {
                 help();
-            } else if (values[i].startsWith("--")) {
-                values = handleDefaults(values);
+            } else if (arg.startsWith("--")) {
+                if (argumentMap.containsKey(arg)) {
+                    Argument current = argumentMap.get(arg);
+                    if (current.getType().equals("boolean")) {
+                        current.setValue("true");
+                    } else {
+                        String value = queue.remove();
+                        if(legitimateValue(current.getType(), value)) {
+                            current.setValue(value);
+                        }
+                        else {
+                            System.out.println("bad value");
+                        }
+                    }
+                }
+            } else {
+                if(positionalIndex >= argumentNames.size()) {
+                    throw new ArgumentException("missing " + arg);
+                }
+                else {
+                    String posName = argumentNames.get(positionalIndex);
+                    positionalIndex++;
+                    Argument current = argumentMap.get(posName);
+                    if(legitimateValue(current.getType(), arg)) {
+                        current.setValue(arg);                        
+                    }
+                    else {
+                        System.out.println("bad value");                        
+                    }
+                }
             }
         }
-        String error = "";
-        if (values.length != argumentNames.size()) {
-            if (values.length < argumentNames.size()) {
-                handleError(true, makeString(argumentNames.subList(values.length, argumentNames.size())));
-            } else {
-                for (int i = argumentNames.size(); i < values.length; i++) {
-                    error += values[i] + " ";
-                }
-                handleError(false, error.trim());
-            }
-        } else {
-            int index = 0;
-            for (String name : argumentNames) {
-                Argument arg = argumentMap.get(name);
-                if (legitimateValue(arg.getType(), values[index])) {
-                    arg.setValue(values[index]);
-                    argumentMap.replace(name, arg);
-                    index++;
-                } else {
-                    error = "argument " + name + ": invalid " + arg.getType() + " value: " + values[index];
-                    handleTypeError(error.trim());
-                }
-            }
+        if(positionalIndex < argumentNames.size()) {
+            String msg = makeUsageMessage();
+            msg += programName + ".java: error: the following arguments are required: " + argumentNames.get(positionalIndex);
+            throw new ArgumentException(msg);
         }
     }
+
+
 
     public String getValue(String name) {
         Argument arg = argumentMap.get(name);

@@ -8,9 +8,8 @@ public class Feature01 {
 	String message = "";
 
 	public void startProgramWithArguments(String[] args) {
-		parser = new ArgumentParser();
+		parser = new ArgumentParser("VolumeCalculator");
 		String[] names = { "length", "width", "height" };
-		parser.setProgramName("VolumeCalculator");
 		parser.setArguments(names);
 		try {
 			parser.setArgumentValues(args);
@@ -42,7 +41,7 @@ public class Feature01 {
 	}
 
 	public void startAbsurdProgramWithArguments(String[] args) {
-		absurdParser = new ArgumentParser();
+		absurdParser = new ArgumentParser("");
 		String[] names = { "pet", "number", "rainy", "bathrooms" };
 		absurdParser.setArguments(names);
 		absurdParser.setArgumentValues(args);
