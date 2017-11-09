@@ -49,11 +49,13 @@ public class ArgumentParser {
     public void setArgumentDescription(String name, String description) {
         Argument arg = argumentMap.get(name);
         arg.setDescription(description);
+        argumentMap.replace(name, arg);
     }
 
     public void setArgumentType(String name, String typeName) {
         Argument arg = argumentMap.get(name);
         arg.setType(typeName);
+        argumentMap.replace(name, arg);
     }
 
     public void setArgumentValues(String[] values) {
@@ -61,11 +63,11 @@ public class ArgumentParser {
         for (String s : values) {
             queue.add(s);
         }
-        String msg = makeUsageMessage();
+
         int positionalIndex = 0;
         while (!queue.isEmpty()) {
             String arg = queue.remove();
-            if (arg.equals("-h") || arg.equals("--help")) {
+            if (arg.equals("-h")) {
                 help();
             } else if (arg.startsWith("--")) {
                 if (argumentMap.containsKey(arg)) {
@@ -78,15 +80,13 @@ public class ArgumentParser {
                             current.setValue(value);
                         }
                         else {
-                            msg += programName + ".java: error: argument " + current.getName() + ": invalid " + current.getType() + " value: " + value;
-                            throw new ArgumentException(msg);
+                            System.out.println("bad value");
                         }
                     }
                 }
             } else {
                 if(positionalIndex >= argumentNames.size()) {
-                    msg += programName + ".java: error: unrecognized arguments: " + arg;
-                    throw new ArgumentException(msg);
+                    throw new ArgumentException("missing " + arg);
                 }
                 else {
                     String posName = argumentNames.get(positionalIndex);
@@ -96,17 +96,19 @@ public class ArgumentParser {
                         current.setValue(arg);                        
                     }
                     else {
-                        msg += programName + ".java: error: argument " + current.getName() + ": invalid " + current.getType() + " value: " + arg;
-                        throw new ArgumentException(msg);                       
+                        System.out.println("bad value");                        
                     }
                 }
             }
         }
         if(positionalIndex < argumentNames.size()) {
+            String msg = makeUsageMessage();
             msg += programName + ".java: error: the following arguments are required: " + argumentNames.get(positionalIndex);
             throw new ArgumentException(msg);
         }
     }
+
+
 
     public String getValue(String name) {
         Argument arg = argumentMap.get(name);
@@ -121,6 +123,40 @@ public class ArgumentParser {
     public String getType(String name) {
         Argument arg = argumentMap.get(name);
         return arg.getType();
+    }
+
+    private void handleError(boolean errorType, String error) {
+        String message = makeUsageMessage();
+        message += programName + ".java: error: ";
+        if (errorType) {
+            message += "the following arguments are required: ";
+        } else {
+            message += "unrecognized arguments: ";
+        }
+        message += error;
+        throw new ArgumentException(message);
+    }
+
+    private void handleTypeError(String error) {
+        String message = makeUsageMessage();
+        message += programName + ".java: error: ";
+        message += error;
+        throw new ArgumentException(message);
+    }
+
+    private String[] handleDefaults(String[] values) {
+        List<String> required = new ArrayList<String>();
+        for (int i = 0; i < values.length; i++) {
+            if (!values[i].startsWith("--")) {
+                required.add(values[i]);
+            } else {
+                Argument arg = argumentMap.get(values[i]);
+                arg.setValue(values[i + 1]);
+                argumentMap.replace(values[i], arg);
+                i++;
+            }
+        }
+        return required.toArray(new String[0]);
     }
 
     private void help() {
