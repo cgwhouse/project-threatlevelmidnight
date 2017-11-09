@@ -108,6 +108,10 @@ public class ArgumentParser {
         }
     }
 
+    public String getProgramName() {
+        return programName;
+    }
+
     public String getValue(String name) {
         Argument arg = argumentMap.get(name);
         return arg.getValue();

@@ -12,14 +12,19 @@ public class ArgumentParserTest {
         parser = new ArgumentParser("VolumeCalculator");
     }
 
+    @Test
+    public void testProgramNameIsSet() {
+        assertEquals("VolumeCalculator", parser.getProgramName());
+    }
+
     @Test(expected = ArgumentException.class)
-    public void testInitialParserIsCorrect() {
-        String[] args = { "height" };
+    public void testEmptyParserCannotSetValues() {
+        String[] args = { "7" };
         parser.setArgumentValues(args);
     }
 
     @Test
-    public void testGetValueWorks() {
+    public void testGetValue() {
         String[] argumentNames = { "length", "width", "height" };
         String[] argumentValues = { "7", "5", "2" };
 
@@ -58,8 +63,8 @@ public class ArgumentParserTest {
             parser.setArgumentValues(argumentValues);
 
             parser.getValue("height");
-        } catch (final ArgumentException error) {
-            final String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: unrecognized arguments: 43";
+        } catch (ArgumentException error) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: unrecognized arguments: 43";
 
             assertEquals(message, error.getMessage());
         }
@@ -75,8 +80,8 @@ public class ArgumentParserTest {
             parser.setArgumentValues(argumentValues);
 
             parser.getValue("height");
-        } catch (final ArgumentException error) {
-            final String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are required: height";
+        } catch (ArgumentException error) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are required: height";
             assertEquals(message, error.getMessage());
         }
     }
@@ -97,8 +102,8 @@ public class ArgumentParserTest {
             }
 
             parser.setArgumentValues(argumentValues);
-        } catch (final ArgumentException error) {
-            final String message = "usage: java VolumeCalculator length width height\nCalculate the volume of a box.\npositional arguments:\nlength the length of the box (float)\nwidth the width of the box (float)\nheight the height of the box (float)";
+        } catch (ArgumentException error) {
+            String message = "usage: java VolumeCalculator length width height\nCalculate the volume of a box.\npositional arguments:\nlength the length of the box (float)\nwidth the width of the box (float)\nheight the height of the box (float)";
             assertEquals(message, error.getMessage());
         }
     }
@@ -135,8 +140,8 @@ public class ArgumentParserTest {
 
             parser.setArgumentValues(argumentValues);
 
-        } catch (final ArgumentException error) {
-            final String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: argument width: invalid float value: something";
+        } catch (ArgumentException error) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: argument width: invalid float value: something";
             assertEquals(message, error.getMessage());
         }
     }
@@ -188,7 +193,26 @@ public class ArgumentParserTest {
     }
 
     @Test
-    public void testFlagIsSet() {
+    public void testDefaultArgumentInvalidType() {
+        String[] argumentNames = { "length", "width", "height" };
+        String[] argumentValues = { "7", "5", "--digits", "square", "2" };
+
+        Argument arg = new Argument("--digits");
+        arg.setType("int");
+        arg.setValue("1");
+        parser.setArgument(arg);
+        parser.setArguments(argumentNames);
+
+        try {
+            parser.setArgumentValues(argumentValues);
+        } catch (ArgumentException e) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: argument --digits: invalid int value: square";
+            assertEquals(e.getMessage(), message);
+        }
+    }
+
+    @Test
+    public void testFlagIsSetWhenPresent() {
         String[] argumentNames = { "length", "width", "height" };
         String[] argumentValues = { "7", "5", "--test", "2" };
 
