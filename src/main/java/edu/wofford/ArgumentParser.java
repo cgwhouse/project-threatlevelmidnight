@@ -74,36 +74,36 @@ public class ArgumentParser {
                         current.setValue("true");
                     } else {
                         String value = queue.remove();
-                        if(legitimateValue(current.getType(), value)) {
+                        if (legitimateValue(current.getType(), value)) {
                             current.setValue(value);
-                        }
-                        else {
-                            msg += programName + ".java: error: argument " + current.getName() + ": invalid " + current.getType() + " value: " + value;
+                        } else {
+                            msg += programName + ".java: error: argument " + current.getName() + ": invalid "
+                                    + current.getType() + " value: " + value;
                             throw new ArgumentException(msg);
                         }
                     }
                 }
             } else {
-                if(positionalIndex >= argumentNames.size()) {
+                if (positionalIndex >= argumentNames.size()) {
                     msg += programName + ".java: error: unrecognized arguments: " + arg;
                     throw new ArgumentException(msg);
-                }
-                else {
+                } else {
                     String posName = argumentNames.get(positionalIndex);
                     positionalIndex++;
                     Argument current = argumentMap.get(posName);
-                    if(legitimateValue(current.getType(), arg)) {
-                        current.setValue(arg);                        
-                    }
-                    else {
-                        msg += programName + ".java: error: argument " + current.getName() + ": invalid " + current.getType() + " value: " + arg;
-                        throw new ArgumentException(msg);                       
+                    if (legitimateValue(current.getType(), arg)) {
+                        current.setValue(arg);
+                    } else {
+                        msg += programName + ".java: error: argument " + current.getName() + ": invalid "
+                                + current.getType() + " value: " + arg;
+                        throw new ArgumentException(msg);
                     }
                 }
             }
         }
-        if(positionalIndex < argumentNames.size()) {
-            msg += programName + ".java: error: the following arguments are required: " + argumentNames.get(positionalIndex);
+        if (positionalIndex < argumentNames.size()) {
+            msg += programName + ".java: error: the following arguments are required: "
+                    + argumentNames.get(positionalIndex);
             throw new ArgumentException(msg);
         }
     }
