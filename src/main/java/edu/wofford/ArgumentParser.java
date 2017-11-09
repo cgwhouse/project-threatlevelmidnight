@@ -8,10 +8,12 @@ public class ArgumentParser {
     private Map<String, Argument> argumentMap;
     private String programName;
     private String programDescription;
+    private Map<String, String> shortFormMap;
 
     public ArgumentParser(String programName) {
         argumentNames = new ArrayList<String>();
         argumentMap = new HashMap<String, Argument>();
+        shortFormMap = new HashMap<String, String>();
         this.programName = programName;
         programDescription = "";
     }
@@ -56,6 +58,26 @@ public class ArgumentParser {
         arg.setType(typeName);
     }
 
+    public void setFlags(String flag) {
+        if (flag.startsWith("-") && !flag.startsWith("--")) {
+            for (int i = 1; i < flag.length(); i++) {
+                String name = "-" + Character.toString(flag.charAt(i));
+                Argument shortFormFlag = new Argument(name);
+                shortFormFlag.setValue("false");
+                shortFormFlag.setType("boolean");
+                argumentMap.put(name, shortFormFlag);
+            }
+        }
+    }
+
+    public void setShortFormName(String argumentName, String shortName) {
+        if (!shortName.equals("-h")) {
+            if (argumentMap.containsKey(argumentName)) {
+                shortFormMap.put(shortName, argumentName);
+            }
+        }
+    }
+
     public void setArgumentValues(String[] values) {
         Queue<String> queue = new ArrayDeque<>();
         for (String s : values) {
@@ -83,7 +105,39 @@ public class ArgumentParser {
                         }
                     }
                 }
-            } else {
+            } else if (arg.startsWith("-") && !arg.startsWith("--")) {
+                if (arg.length() >= 3) {
+                    for (int i = 1; i < arg.length(); i++){
+                        String name = "-" + Character.toString(arg.charAt(i));
+                        Argument flag = argumentMap.get(name);
+                        flag.setValue("true");
+                    }
+                }
+                else {
+                    if (argumentMap.containsKey(arg)) {
+                        Argument flag = argumentMap.get(arg);
+                        flag.setValue("true"); 
+                    }
+                    else {
+                        String argName = shortFormMap.get(arg);
+                        Argument longForm = argumentMap.get(argName);
+                        //ADD WHILE LOGIC TO CHOMP MORE VALUES IN FUTURE FEATURES
+                        if (longForm.getType().equals("boolean")) {
+                            longForm.setValue("true");
+                        } else {
+                            String value = queue.remove();
+                            if (legitimateValue(longForm.getType(), value)) {
+                                longForm.setValue(value);
+                            } else {
+                                msg += programName + ".java: error: argument " + longForm.getName() + ": invalid "
+                                        + longForm.getType() + " value: " + value;
+                                throw new ArgumentException(msg);
+                            }
+                        }
+                    }
+                }
+            }
+            else {
                 if (positionalIndex >= argumentNames.size()) {
                     msg += programName + ".java: error: unrecognized arguments: " + arg;
                     throw new ArgumentException(msg);
@@ -113,6 +167,11 @@ public class ArgumentParser {
     }
 
     public String getValue(String name) {
+        // if (name.startsWith("-")){
+        //     if (shortFormMap.containsKey(name)) {
+        //         name = shortFormMap.get(name);
+        //     }
+        // }
         Argument arg = argumentMap.get(name);
         return arg.getValue();
     }

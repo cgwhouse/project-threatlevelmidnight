@@ -227,4 +227,38 @@ public class ArgumentParserTest {
 
         assertEquals("true", parser.getValue("--test"));
     }
+
+    @Test
+    public void testShortFormNames() {
+        String[] argumentNames = { "length", "width", "height" };
+        String[] argumentValues = { "7", "5", "-t", "2", "2" };
+
+        Argument arg = new Argument("--test");
+        arg.setType("int");
+        arg.setValue("1");
+
+        parser.setArguments(argumentNames);
+        parser.setArgument(arg);
+        parser.setShortFormName("--test", "-t");
+
+        parser.setArgumentValues(argumentValues);
+
+        assertEquals("2", parser.getValue("--test"));
+    }
+
+    //ADD UNIT TEST FOR FAILING SHORTFORMNAMES; cause feature07 to error.
+
+    @Test
+    public void testFlags() {
+        String[] argumentNames = { "length", "width", "height" };
+        String[] argumentValues = { "7", "5", "2", "-lwh" };
+
+        parser.setFlags("-lwh");
+
+        parser.setArguments(argumentNames);
+
+        parser.setArgumentValues(argumentValues);
+
+        assertEquals("true", parser.getValue("-l"));
+    }
 }
