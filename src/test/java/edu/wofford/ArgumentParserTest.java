@@ -187,20 +187,20 @@ public class ArgumentParserTest {
         assertEquals("square", parser.getValue("--type"));
     }
 
-    // @Test()
-    // public void testFlagIsSet() {
-    //     String[] argumentNames = { "length", "width", "height" };
-    //     String[] argumentValues = { "7", "5", "--test", "2" };
+    @Test
+    public void testFlagIsSet() {
+        String[] argumentNames = { "length", "width", "height" };
+        String[] argumentValues = { "7", "5", "--test", "2" };
 
-    //     Argument arg = new Argument("--test");
-    //     arg.setValue("false");
+        Argument arg = new Argument("--test");
+        arg.setType("boolean");
+        arg.setValue("false");
 
-    //     parser = new ArgumentParser();
-    //     parser.setArguments(argumentNames);
-    //     parser.setArgument(arg);
+        parser.setArguments(argumentNames);
+        parser.setArgument(arg);
 
-    //     parser.setArgumentValues(argumentValues);
+        parser.setArgumentValues(argumentValues);
 
-    //     assertEquals("true", parser.getValue("--test"));
-    // }
+        assertEquals("true", parser.getValue("--test"));
+    }
 }
