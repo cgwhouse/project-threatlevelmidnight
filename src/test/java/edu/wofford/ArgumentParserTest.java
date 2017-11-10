@@ -231,15 +231,15 @@ public class ArgumentParserTest {
     @Test
     public void testShortFormNames() {
         String[] argumentNames = { "length", "width", "height" };
-        String[] argumentValues = { "7", "5", "-t", "2", "2" };
+        String[] argumentValues = { "7", "5", "-e", "2", "2" };
 
         Argument arg = new Argument("--test");
         arg.setType("int");
         arg.setValue("1");
 
         parser.setArguments(argumentNames);
-        parser.setArgument(arg);
-        parser.setShortFormName("--test", "-t");
+        parser.setNamedArgument(arg, "te");
+        //parser.setShortFormName(arg, "-t");
 
         parser.setArgumentValues(argumentValues);
 

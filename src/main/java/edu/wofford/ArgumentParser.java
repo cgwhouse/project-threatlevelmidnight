@@ -48,6 +48,20 @@ public class ArgumentParser {
         argumentMap.put(name, arg);
     }
 
+    public void setNamedArgument(Argument arg, String shortFormNames) {
+        argumentMap.put(arg.getName(), arg);
+        for (int i = 1; i < shortFormNames.length(); i++) {
+            String name = "-" + Character.toString(shortFormNames.charAt(i));
+            if (!name.equals("-h")) {
+                shortFormMap.put(name, arg.getName());
+            }
+        }
+    }
+
+    public void setNamedArgument(Argument arg) {
+        argumentMap.put(arg.getName(), arg);
+    }
+
     public void setArgumentDescription(String name, String description) {
         Argument arg = argumentMap.get(name);
         arg.setDescription(description);
@@ -66,14 +80,6 @@ public class ArgumentParser {
                 shortFormFlag.setValue("false");
                 shortFormFlag.setType("boolean");
                 argumentMap.put(name, shortFormFlag);
-            }
-        }
-    }
-
-    public void setShortFormName(String argumentName, String shortName) {
-        if (!shortName.equals("-h")) {
-            if (argumentMap.containsKey(argumentName)) {
-                shortFormMap.put(shortName, argumentName);
             }
         }
     }
