@@ -115,8 +115,14 @@ public class ArgumentParser {
                 if (arg.length() >= 3) {
                     for (int i = 1; i < arg.length(); i++){
                         String name = "-" + Character.toString(arg.charAt(i));
-                        Argument flag = argumentMap.get(name);
-                        flag.setValue("true");
+                        if (argumentMap.containsKey(name)) {
+                            Argument flag = argumentMap.get(name);
+                            flag.setValue("true");
+                        }
+                        else {
+                            msg += programName + ".java: error: unrecognized flag: " + name;
+                            throw new ArgumentException(msg);
+                        }
                     }
                 }
                 else {

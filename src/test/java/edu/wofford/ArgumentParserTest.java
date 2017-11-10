@@ -239,26 +239,68 @@ public class ArgumentParserTest {
 
         parser.setArguments(argumentNames);
         parser.setNamedArgument(arg, "te");
-        //parser.setShortFormName(arg, "-t");
 
         parser.setArgumentValues(argumentValues);
 
         assertEquals("2", parser.getValue("--test"));
     }
 
-    //ADD UNIT TEST FOR FAILING SHORTFORMNAMES; cause feature07 to error.
+    @Test
+    public void testInvalidShortFormNameDashH() {
+        try {
+            String[] argumentNames = { "length", "width", "height" };
+            String[] argumentValues = { "7", "5", "-h", "2", "2" };
+
+            String[] argumentDescriptions = { "the length of the box (float)", "the width of the box (float)",
+                    "the height of the box (float)" };
+
+            parser.setProgramDescription("Calculate the volume of a box.");
+            parser.setArguments(argumentNames);
+
+            for (int i = 0; i < argumentNames.length; i++) {
+                parser.setArgumentDescription(argumentNames[i], argumentDescriptions[i]);
+            }
+
+            Argument arg = new Argument("--hue");
+            arg.setType("int");
+            arg.setValue("3");
+            parser.setNamedArgument(arg, "hue");
+    
+            parser.setArgumentValues(argumentValues);
+        } catch (ArgumentException error) {
+            String message = "usage: java VolumeCalculator length width height\nCalculate the volume of a box.\npositional arguments:\nlength the length of the box (float)\nwidth the width of the box (float)\nheight the height of the box (float)";
+            assertEquals(message, error.getMessage());
+        }
+    }
 
     @Test
     public void testFlags() {
         String[] argumentNames = { "length", "width", "height" };
-        String[] argumentValues = { "7", "5", "2", "-lwh" };
+        String[] argumentValues = { "7", "5", "2", "-abc" };
 
-        parser.setFlags("-lwh");
+        parser.setFlags("-abc");
 
         parser.setArguments(argumentNames);
 
         parser.setArgumentValues(argumentValues);
 
-        assertEquals("true", parser.getValue("-l"));
+        assertEquals("true", parser.getValue("-b"));
+    }
+
+    @Test
+    public void testNonDeclaredFlags() {
+        try {
+            String[] argumentNames = { "length", "width", "height" };
+            String[] argumentValues = { "7", "5", "2", "-abc" };
+    
+            parser.setArguments(argumentNames);
+    
+            parser.setArgumentValues(argumentValues);
+    
+            assertEquals("true", parser.getValue("-b"));
+        } catch (ArgumentException error) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: unrecognized flag: -a";
+            assertEquals(message, error.getMessage());
+        }
     }
 }
