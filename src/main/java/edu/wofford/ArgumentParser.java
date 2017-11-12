@@ -115,6 +115,9 @@ public class ArgumentParser {
                         } else if (shortFormMap.containsKey(name)) {
                             Argument longForm = argumentMap.get(shortFormMap.get(name));
                             longForm.setValue("true");
+                        } else {
+                            msg += programName + ".java: error: unrecognized flag: " + name;
+                            throw new ArgumentException(msg);
                         }
                     }
                 } else {
