@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 
 public class ArgumentParserTest {
     private ArgumentParser parser;
+    String[] argumentNames = { "length", "width", "height" };
 
     @Before
     public void setup() {
@@ -25,7 +26,6 @@ public class ArgumentParserTest {
 
     @Test
     public void testGetValue() {
-        String[] argumentNames = { "length", "width", "height" };
         String[] argumentValues = { "7", "5", "2" };
 
         parser.setArguments(argumentNames);
@@ -38,7 +38,6 @@ public class ArgumentParserTest {
 
     @Test
     public void testOptionsForSetArgument() {
-        String[] argumentNames = { "length", "width", "height" };
         String[] argumentValues = { "7", "5", "2" };
 
         Argument arg = new Argument(argumentNames[0]);
@@ -56,7 +55,6 @@ public class ArgumentParserTest {
     @Test
     public void testTooManyArguments() {
         try {
-            String[] argumentNames = { "length", "width", "height" };
             String[] argumentValues = { "7", "5", "2", "43" };
 
             parser.setArguments(argumentNames);
@@ -73,7 +71,6 @@ public class ArgumentParserTest {
     @Test
     public void testTooFewArguments() {
         try {
-            String[] argumentNames = { "length", "width", "height" };
             String[] argumentValues = { "7", "5" };
 
             parser.setArguments(argumentNames);
@@ -89,7 +86,6 @@ public class ArgumentParserTest {
     @Test
     public void testHelpArgument() {
         try {
-            String[] argumentNames = { "length", "width", "height" };
             String[] argumentDescriptions = { "the length of the box (float)", "the width of the box (float)",
                     "the height of the box (float)" };
             String[] argumentValues = { "-h" };
@@ -110,7 +106,6 @@ public class ArgumentParserTest {
 
     @Test
     public void testSetTypeWorks() {
-        String[] argumentNames = { "length", "width", "height" };
         String[] argumentValues = { "7", "5", "2" };
         String[] argumentTypes = { "string", "string", "string" };
 
@@ -128,7 +123,6 @@ public class ArgumentParserTest {
     @Test
     public void testSetTypeInvalidType() {
         try {
-            String[] argumentNames = { "length", "width", "height" };
             String[] argumentValues = { "true", "something", "2" };
             String[] argumentTypes = { "boolean", "float", "int" };
 
@@ -148,7 +142,6 @@ public class ArgumentParserTest {
 
     @Test
     public void testDefaultArgumentsAcquiresNewValue() {
-        String[] argumentNames = { "length", "width", "height" };
         String[] argumentValues = { "7", "5", "2", "--type", "square" };
 
         Argument arg = new Argument("--type");
@@ -163,7 +156,6 @@ public class ArgumentParserTest {
 
     @Test
     public void testDefaultArgumentRetainsDefaultValue() {
-        String[] argumentNames = { "length", "width", "height" };
         String[] argumentValues = { "7", "5", "2" };
 
         Argument arg = new Argument("--type");
@@ -178,7 +170,6 @@ public class ArgumentParserTest {
 
     @Test
     public void testDefaultArgumentsOutOfOrder() {
-        String[] argumentNames = { "length", "width", "height" };
         String[] argumentValues = { "7", "5", "--type", "square", "2" };
 
         Argument arg = new Argument("--type");
@@ -194,7 +185,6 @@ public class ArgumentParserTest {
 
     @Test
     public void testDefaultArgumentInvalidType() {
-        String[] argumentNames = { "length", "width", "height" };
         String[] argumentValues = { "7", "5", "--digits", "square", "2" };
 
         Argument arg = new Argument("--digits");
@@ -213,7 +203,6 @@ public class ArgumentParserTest {
 
     @Test
     public void testFlagIsSetWhenPresent() {
-        String[] argumentNames = { "length", "width", "height" };
         String[] argumentValues = { "7", "5", "--test", "2" };
 
         Argument arg = new Argument("--test");
@@ -230,7 +219,6 @@ public class ArgumentParserTest {
 
     @Test
     public void testShortFormNames() {
-        String[] argumentNames = { "length", "width", "height" };
         String[] argumentValues = { "7", "5", "-e", "2", "2" };
 
         Argument arg = new Argument("--test");
@@ -238,8 +226,7 @@ public class ArgumentParserTest {
         arg.setValue("1");
 
         parser.setArguments(argumentNames);
-        parser.setNamedArgument(arg, "te");
-        //parser.setShortFormName(arg, "-t");
+        parser.setNamedArgument(arg, "-te");
 
         parser.setArgumentValues(argumentValues);
 
@@ -250,7 +237,6 @@ public class ArgumentParserTest {
 
     @Test
     public void testFlags() {
-        String[] argumentNames = { "length", "width", "height" };
         String[] argumentValues = { "7", "5", "2", "-lwh" };
 
         parser.setFlags("-lwh");
@@ -260,5 +246,7 @@ public class ArgumentParserTest {
         parser.setArgumentValues(argumentValues);
 
         assertEquals("true", parser.getValue("-l"));
+        assertEquals("true", parser.getValue("-w"));
+        assertEquals("true", parser.getValue("-h"));
     }
 }
