@@ -102,48 +102,37 @@ public class ArgumentParser {
                         current.setValue("true");
                     } else {
                         String value = queue.remove();
-                        if (legitimateValue(current.getType(), value)) {
-                            current.setValue(value);
-                        } else {
-                            msg += programName + ".java: error: argument " + current.getName() + ": invalid "
-                                    + current.getType() + " value: " + value;
-                            throw new ArgumentException(msg);
-                        }
+                        checkAndSet(current, value);
                     }
                 }
             } else if (arg.startsWith("-") && !arg.startsWith("--")) {
-                if (arg.length() >= 3) {
-                    for (int i = 1; i < arg.length(); i++){
+                if (arg.length() > 2) {
+                    for (int i = 1; i < arg.length(); i++) {
                         String name = "-" + Character.toString(arg.charAt(i));
-                        Argument flag = argumentMap.get(name);
-                        flag.setValue("true");
+                        if (argumentMap.containsKey(name)) {
+                            Argument flag = argumentMap.get(name);
+                            flag.setValue("true");
+                        } else if (shortFormMap.containsKey(name)) {
+                            Argument longForm = argumentMap.get(shortFormMap.get(name));
+                            longForm.setValue("true");
+                        }
                     }
-                }
-                else {
+                } else {
                     if (argumentMap.containsKey(arg)) {
                         Argument flag = argumentMap.get(arg);
-                        flag.setValue("true"); 
-                    }
-                    else {
-                        String argName = shortFormMap.get(arg);
-                        Argument longForm = argumentMap.get(argName);
+                        flag.setValue("true");
+                    } else if (shortFormMap.containsKey(arg)) {
+                        Argument longForm = argumentMap.get(shortFormMap.get(arg));
                         //ADD WHILE LOGIC TO CHOMP MORE VALUES IN FUTURE FEATURES
                         if (longForm.getType().equals("boolean")) {
                             longForm.setValue("true");
                         } else {
                             String value = queue.remove();
-                            if (legitimateValue(longForm.getType(), value)) {
-                                longForm.setValue(value);
-                            } else {
-                                msg += programName + ".java: error: argument " + longForm.getName() + ": invalid "
-                                        + longForm.getType() + " value: " + value;
-                                throw new ArgumentException(msg);
-                            }
+                            checkAndSet(longForm, value);
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 if (positionalIndex >= argumentNames.size()) {
                     msg += programName + ".java: error: unrecognized arguments: " + arg;
                     throw new ArgumentException(msg);
@@ -151,13 +140,7 @@ public class ArgumentParser {
                     String posName = argumentNames.get(positionalIndex);
                     positionalIndex++;
                     Argument current = argumentMap.get(posName);
-                    if (legitimateValue(current.getType(), arg)) {
-                        current.setValue(arg);
-                    } else {
-                        msg += programName + ".java: error: argument " + current.getName() + ": invalid "
-                                + current.getType() + " value: " + arg;
-                        throw new ArgumentException(msg);
-                    }
+                    checkAndSet(current, arg);
                 }
             }
         }
@@ -173,11 +156,11 @@ public class ArgumentParser {
     }
 
     public String getValue(String name) {
-        // if (name.startsWith("-")){
-        //     if (shortFormMap.containsKey(name)) {
-        //         name = shortFormMap.get(name);
-        //     }
-        // }
+        if (name.startsWith("-")) {
+            if (shortFormMap.containsKey(name)) {
+                name = shortFormMap.get(name);
+            }
+        }
         Argument arg = argumentMap.get(name);
         return arg.getValue();
     }
@@ -216,6 +199,17 @@ public class ArgumentParser {
         return "usage: java " + programName + " " + makeString(argumentNames) + "\n";
     }
 
+    private void checkAndSet(Argument current, String value) {
+        if (legitimateValue(current.getType(), value)) {
+            current.setValue(value);
+        } else {
+            String msg = makeUsageMessage();
+            msg += programName + ".java: error: argument " + current.getName() + ": invalid " + current.getType()
+                    + " value: " + value;
+            throw new ArgumentException(msg);
+        }
+    }
+
     private boolean legitimateValue(String typeName, String value) {
         try {
             if (typeName.equals("int")) {
@@ -232,17 +226,4 @@ public class ArgumentParser {
         }
         return true;
     }
-
-    // private <T> T castValue(String typeName, String value) {
-    //     switch (typeName) {
-    //         case typeName.equals("int"):
-    //             return (T) Integer.valueOf(value);
-    //         case typeName.equals("float"):
-    //             return (T) float.valueOf(value);
-    //         case typeName.equals("boolean"):
-    //             return (T) boolean.valueOf(value);
-    //         default:
-    //             return value;
-    //     }
-    // }
 }
