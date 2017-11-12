@@ -3,48 +3,57 @@ import edu.wofford.*;
 public class VolumeCalculator {
 
     public static void main(String[] args) {
-        System.out.println("Example 1: VolumeCalculator 5 --type square 4 3\n");
+        ArgumentParser parser = new ArgumentParser("VolumeCalculator");
+        parser.setProgramDescription("Calculates the volume of a box, ellipsoid, or pyramid.");
 
-        ArgumentParser parser = new ArgumentParser();
-        String[] requiredArguments = { "width", "height" };
-
-        Argument lengthArg = new Argument("length");
-        lengthArg.setType("float");
-        lengthArg.setDescription("the length of the box");
-
-        String programName = "Volume Calculator";
-        String programDescription = "Calculates the volume of a box";
-        String[] argumentsValues = { "5", "--type", "square", "4", "3" };
-        String[] helpValue = { "-h" };
-        String[] requiredArgumentsDescriptions = { "the width of the box", "the height of the box" };
-        String[] requiredArgumentsTypes = { "float", "float"};
-        
-        Argument arg = new Argument("--type");
-        arg.setValue("ellipsoid");
-        
-        parser.setProgramName(programName);
-        parser.setProgramDescription(programDescription);
-        parser.setArgument(lengthArg);
-        parser.setArguments(requiredArguments);
-        parser.setArgument(arg);
-        for (int i = 0; i < 2; i++) {
-            parser.setArgumentType(requiredArguments[i], requiredArgumentsTypes[i]);
-            parser.setArgumentDescription(requiredArguments[i], requiredArgumentsDescriptions[i]);
+        String[] positionals = { "length", "width", "height" };
+        for (String name : positionals) {
+            Argument arg = new Argument(name);
+            arg.setType("float");
+            arg.setDescription("The " + name + " of the shape");
+            parser.setArgument(arg);
         }
 
-        parser.setArgumentValues(argumentsValues);
+        Argument typeArg = new Argument("--type");
+        typeArg.setType("string");
+        typeArg.setValue("square");
+        parser.setNamedArgument(typeArg, "-t");
 
-        System.out.println("The value of width should be 4... it is... " + parser.getValue("width"));
-        System.out.println("The type of length should be float... it is... " + lengthArg.getType());
-        System.out.println("The value of --type should be square... it is... " + parser.getValue("--type"));
-
-        System.out.println("\nExample 2: VolumeCalculator -h\n");
-        System.out.println("The following help message is displayed when passing -h...");
-
+        parser.setFlags("-as");
         try {
-            parser.setArgumentValues(helpValue);
-        } catch (final ArgumentException error) {
-            System.out.println(error.getMessage());
+            if (args.length == 0) {
+                String helpMessage = "\n";
+                helpMessage += "java VolumeCalculator length width height\n\n";
+                helpMessage += "Example 1: VolumeCalculator 5 --type ellipsoid 4 3\n";
+                helpMessage += "The value of width is 4.\n";
+                helpMessage += "The type of length is float.\n";
+                helpMessage += "The value of --type is ellipsoid (default is square).\n";
+                helpMessage += "The short form of --type is -t.\n";
+                System.out.println(helpMessage);
+                String[] help = { "-h" };
+                parser.setArgumentValues(help);
+            } else {
+                parser.setArgumentValues(args);
+                double result = 1;
+                for (String name : positionals) {
+                    result *= Double.parseDouble(parser.getValue(name));
+                }
+                if (parser.getValue("--type").equals("pyramid")) {
+                    result /= 3;
+                } else if (parser.getValue("--type").equals("ellipsoid")) {
+                    result *= 4 * Math.PI;
+                    result /= 3;
+                }
+                if (parser.getValue("-a").equals("true")) {
+                    result += 50;
+                }
+                if (parser.getValue("-s").equals("true")) {
+                    result -= 75;
+                }
+                System.out.println(result);
+            }
+        } catch (ArgumentException e) {
+            System.out.println(e.getMessage());
         }
     }
 }
