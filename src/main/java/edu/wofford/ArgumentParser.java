@@ -28,24 +28,30 @@ public class ArgumentParser {
 
     public void setArguments(String[] names) {
         for (String name : names) {
+            if (!name.equals("-h")) {
+                argumentNames.add(name);
+                Argument arg = new Argument(name);
+                argumentMap.put(name, arg);
+            }
+        }
+    }
+
+    public void setArgument(String name) {
+        if (!name.equals("-h")) {
             argumentNames.add(name);
             Argument arg = new Argument(name);
             argumentMap.put(name, arg);
         }
     }
 
-    public void setArgument(String name) {
-        argumentNames.add(name);
-        Argument arg = new Argument(name);
-        argumentMap.put(name, arg);
-    }
-
     public void setArgument(Argument arg) {
         String name = arg.getName();
-        if (!name.startsWith("--")) {
-            argumentNames.add(name);
+        if (!name.equals("-h")) {
+            if (!name.startsWith("--")) {
+                argumentNames.add(name);
+            }
+            argumentMap.put(name, arg);
         }
-        argumentMap.put(name, arg);
     }
 
     public void setNamedArgument(Argument arg, String shortFormNames) {
@@ -56,10 +62,6 @@ public class ArgumentParser {
                 shortFormMap.put(name, arg.getName());
             }
         }
-    }
-
-    public void setNamedArgument(Argument arg) {
-        argumentMap.put(arg.getName(), arg);
     }
 
     public void setArgumentDescription(String name, String description) {
@@ -76,10 +78,12 @@ public class ArgumentParser {
         if (flag.startsWith("-") && !flag.startsWith("--")) {
             for (int i = 1; i < flag.length(); i++) {
                 String name = "-" + Character.toString(flag.charAt(i));
-                Argument shortFormFlag = new Argument(name);
-                shortFormFlag.setValue("false");
-                shortFormFlag.setType("boolean");
-                argumentMap.put(name, shortFormFlag);
+                if (!name.equals("-h")){
+                    Argument shortFormFlag = new Argument(name);
+                    shortFormFlag.setValue("false");
+                    shortFormFlag.setType("boolean");
+                    argumentMap.put(name, shortFormFlag);
+                }
             }
         }
     }
