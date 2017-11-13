@@ -18,6 +18,12 @@ public class ArgumentParserTest {
         assertEquals("VolumeCalculator", parser.getProgramName());
     }
 
+    @Test
+    public void testProgramNameCanBeOverriden() {
+        parser.setProgramName("new name");
+        assertEquals("new name", parser.getProgramName());
+    }
+
     @Test(expected = ArgumentException.class)
     public void testEmptyParserCannotSetValues() {
         String[] args = { "7" };
@@ -102,6 +108,14 @@ public class ArgumentParserTest {
             String message = "usage: java VolumeCalculator length width height\nCalculate the volume of a box.\npositional arguments:\nlength the length of the box (float)\nwidth the width of the box (float)\nheight the height of the box (float)";
             assertEquals(message, error.getMessage());
         }
+    }
+
+    @Test
+    public void testGetDescription() {
+        Argument arg = new Argument("test");
+        arg.setDescription("test description");
+        parser.setArgument(arg);
+        assertEquals("test description", parser.getDescription("test"));
     }
 
     @Test
@@ -231,6 +245,8 @@ public class ArgumentParserTest {
         parser.setArgumentValues(argumentValues);
 
         assertEquals("2", parser.getValue("--test"));
+        assertEquals("2", parser.getValue("-t"));
+        assertEquals("2", parser.getValue("-e"));
     }
 
     @Test
@@ -277,6 +293,15 @@ public class ArgumentParserTest {
     }
 
     @Test
+    public void testSetSingleFlag() {
+        String[] values = { "7", "5", "2", "-t" };
+        parser.setFlags("-t");
+        parser.setArguments(argumentNames);
+        parser.setArgumentValues(values);
+        assertEquals("true", parser.getValue("-t"));
+    }
+
+    @Test
     public void testNonDeclaredFlags() {
         try {
             String[] argumentValues = { "7", "5", "2", "-abc" };
@@ -290,5 +315,18 @@ public class ArgumentParserTest {
             String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: unrecognized flag: -a";
             assertEquals(message, error.getMessage());
         }
+    }
+
+    @Test
+    public void testBooleanSetTheLongWay() {
+        String[] argumentValues = { "7", "5", "-t", "2" };
+        parser.setArguments(argumentNames);
+        Argument boolArg = new Argument("--test");
+        boolArg.setType("boolean");
+        boolArg.setValue("false");
+        parser.setNamedArgument(boolArg, "-t");
+        parser.setArgumentValues(argumentValues);
+        assertEquals("true", parser.getValue("-t"));
+        assertEquals("true", parser.getValue("--test"));
     }
 }
