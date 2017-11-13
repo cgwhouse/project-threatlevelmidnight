@@ -117,7 +117,7 @@ public class ArgumentParser {
                             longForm.setValue("true");
                         } else {
                             msg += programName + ".java: error: unrecognized flag: " + name;
-                            throw new ArgumentException(msg);
+                            throw new UnrecognizedArgumentException(msg);
                         }
                     }
                 } else {
@@ -138,7 +138,7 @@ public class ArgumentParser {
             } else {
                 if (positionalIndex >= argumentNames.size()) {
                     msg += programName + ".java: error: unrecognized arguments: " + arg;
-                    throw new ArgumentException(msg);
+                    throw new UnrecognizedArgumentException(msg);
                 } else {
                     String posName = argumentNames.get(positionalIndex);
                     positionalIndex++;
@@ -150,7 +150,7 @@ public class ArgumentParser {
         if (positionalIndex < argumentNames.size()) {
             msg += programName + ".java: error: the following arguments are required: "
                     + argumentNames.get(positionalIndex);
-            throw new ArgumentException(msg);
+            throw new MissingRequiredArgumentException(msg);
         }
     }
 
@@ -187,7 +187,7 @@ public class ArgumentParser {
             decrArgs += name + " " + arg.getDescription() + "\n";
         }
         message += decrArgs.trim();
-        throw new ArgumentException(message);
+        throw new HelpException(message);
     }
 
     private String makeString(List<String> list) {
@@ -209,7 +209,7 @@ public class ArgumentParser {
             String msg = makeUsageMessage();
             msg += programName + ".java: error: argument " + current.getName() + ": invalid " + current.getType()
                     + " value: " + value;
-            throw new ArgumentException(msg);
+            throw new InvalidTypeException(msg);
         }
     }
 
