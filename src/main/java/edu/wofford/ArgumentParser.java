@@ -190,6 +190,12 @@ public class ArgumentParser {
         return programName;
     }
 
+    /** 
+     * Gets the value of the argument with the associated name.
+     *
+     * @param name      the name of the variable whose value is wanted
+     * @return          string representation of the variable's value
+     */
     public String getValue(String name) {
         if (name.startsWith("-")) {
             if (shortFormMap.containsKey(name)) {
@@ -200,6 +206,12 @@ public class ArgumentParser {
         return arg.getValue();
     }
 
+    /** 
+     * Gets the description of the argument with the associated name.
+     *
+     * @param name      the name of the variable whose description is wanted
+     * @return          string representation of the variable's description
+     */
     public String getDescription(String name) {
         Argument arg = argumentMap.get(name);
         return arg.getDescription();
