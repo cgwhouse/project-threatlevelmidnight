@@ -28,6 +28,11 @@ task uberjar(type: OneJar) {
     mainClass = mainClassName
 }
 
+javadoc {
+source = sourceSets.main.allJava
+classpath = configurations.compile
+}
+
 repositories {
     mavenCentral()
 }
