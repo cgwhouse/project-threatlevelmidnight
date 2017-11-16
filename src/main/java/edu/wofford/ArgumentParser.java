@@ -10,6 +10,10 @@ public class ArgumentParser {
     private String programDescription;
     private Map<String, String> shortFormMap;
 
+	/** Constructs an ArgumentParser object 
+	 * which requires the program name as a string.
+	 * @param programName The name of the program.
+	 */
     public ArgumentParser(String programName) {
         argumentNames = new ArrayList<String>();
         argumentMap = new HashMap<String, Argument>();
@@ -18,14 +22,27 @@ public class ArgumentParser {
         programDescription = "";
     }
 
+	/** Sets the name of the program. 
+	 * This will change the program name from the default that is set
+	 * with the constructor.
+	 * @param name The new name of the program as a string.
+	 */
     public void setProgramName(String name) {
         programName = name;
     }
 
+	/** Sets the description of the program.
+	 * @param description The description of the program as a string.
+	 */
     public void setProgramDescription(String description) {
         programDescription = description;
     }
 
+	/** Sets the names of the arguments
+	 * For each name in the array, an argument is created.
+	 * Note the argument <strong>"-h"</strong> is not allowed.
+	 * @param names An array of names as strings.
+	 */
     public void setArguments(String[] names) {
         for (String name : names) {
             if (!name.equals("-h")) {
@@ -36,6 +53,11 @@ public class ArgumentParser {
         }
     }
 
+	/** Sets one argument.
+	 * Given a name, an argument is created and set.
+	 * Note the argument <strong>"-h"</strong> is not allowed.
+	 * @param name A name of the argument as string.
+	 */
     public void setArgument(String name) {
         if (!name.equals("-h")) {
             argumentNames.add(name);
@@ -44,6 +66,12 @@ public class ArgumentParser {
         }
     }
 
+	/** Sets one argument.
+	 * The given argument is set for the parser.
+	 * Note the argument with name <strong>"-h"</strong> is not allowed.
+	 * @param arg An Argument object.
+	 * @see Argument
+	 */
     public void setArgument(Argument arg) {
         String name = arg.getName();
         if (!name.equals("-h")) {
@@ -172,6 +200,12 @@ public class ArgumentParser {
         return programName;
     }
 
+    /** 
+     * Gets the value of the argument with the associated name.
+     *
+     * @param name      the name of the variable whose value is wanted
+     * @return          string representation of the variable's value
+     */
     public String getValue(String name) {
         if (name.startsWith("-")) {
             if (shortFormMap.containsKey(name)) {
@@ -182,6 +216,12 @@ public class ArgumentParser {
         return arg.getValue();
     }
 
+    /** 
+     * Gets the description of the argument with the associated name.
+     *
+     * @param name      the name of the variable whose description is wanted
+     * @return          string representation of the variable's description
+     */
     public String getDescription(String name) {
         Argument arg = argumentMap.get(name);
         return arg.getDescription();
