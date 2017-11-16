@@ -10,10 +10,12 @@ public class ArgumentParser {
     private String programDescription;
     private Map<String, String> shortFormMap;
 
-	/** Constructs an ArgumentParser object 
-	 * which requires the program name as a string.
-	 * @param programName The name of the program.
-	 */
+    /** 
+     * Constructs an ArgumentParser object 
+     * which requires the program name as a string.
+     * 
+     * @param programName The name of the program.
+     */
     public ArgumentParser(String programName) {
         argumentNames = new ArrayList<String>();
         argumentMap = new HashMap<String, Argument>();
@@ -22,27 +24,32 @@ public class ArgumentParser {
         programDescription = "";
     }
 
-	/** Sets the name of the program. 
-	 * This will change the program name from the default that is set
-	 * with the constructor.
-	 * @param name The new name of the program as a string.
-	 */
+    /** 
+     * Sets the name of the program. This will change the program name from the default that is set
+     * with the constructor.
+     * 
+     * @param name The new name of the program as a string.
+     */
     public void setProgramName(String name) {
         programName = name;
     }
 
-	/** Sets the description of the program.
-	 * @param description The description of the program as a string.
-	 */
+    /** 
+     * Sets the description of the program.
+     * 
+     * @param description The description of the program as a string.
+     */
     public void setProgramDescription(String description) {
         programDescription = description;
     }
 
-	/** Sets the names of the arguments
-	 * For each name in the array, an argument is created.
-	 * Note the argument <strong>"-h"</strong> is not allowed.
-	 * @param names An array of names as strings.
-	 */
+    /** 
+     * Sets the names of the arguments
+     * For each name in the array, an argument is created.
+     * Note the argument <strong>"-h"</strong> is not allowed.
+     * 
+     * @param names An array of names as strings.
+     */
     public void setArguments(String[] names) {
         for (String name : names) {
             if (!name.equals("-h")) {
@@ -53,11 +60,12 @@ public class ArgumentParser {
         }
     }
 
-	/** Sets one argument.
-	 * Given a name, an argument is created and set.
-	 * Note the argument <strong>"-h"</strong> is not allowed.
-	 * @param name A name of the argument as string.
-	 */
+    /** 
+     * Sets one argument. Given a name, an argument is created and set. Note the argument 
+     * <strong>"-h"</strong> is not allowed.
+     * 
+     * @param name the desired name of the argument as string
+     */
     public void setArgument(String name) {
         if (!name.equals("-h")) {
             argumentNames.add(name);
@@ -66,12 +74,14 @@ public class ArgumentParser {
         }
     }
 
-	/** Sets one argument.
-	 * The given argument is set for the parser.
-	 * Note the argument with name <strong>"-h"</strong> is not allowed.
-	 * @param arg An Argument object.
-	 * @see Argument
-	 */
+    /** 
+     * Sets one argument.
+     * The given argument is set for the parser.
+     * Note the argument with name <strong>"-h"</strong> is not allowed.
+     * 
+     * @param arg the Argument object to be set
+     * @see Argument
+     */
     public void setArgument(Argument arg) {
         String name = arg.getName();
         if (!name.equals("-h")) {
@@ -102,16 +112,37 @@ public class ArgumentParser {
         }
     }
 
+    /**
+     * Sets an argument's description. The argument to be modified must already be known by the
+     * ArgumentParser.
+     * 
+     * @param name        The name of the argument whose description we want to set
+     * @param description The description to set
+     */
     public void setArgumentDescription(String name, String description) {
         Argument arg = argumentMap.get(name);
         arg.setDescription(description);
     }
 
+    /**
+     * Sets an argument's type. The argument to be modified must already be known by the ArgumentParser.
+     * 
+     * @param name     The name of the argument whose type we want to set
+     * @param typeName The type to set. Options are int, float, boolean, and string
+     */
     public void setArgumentType(String name, String typeName) {
         Argument arg = argumentMap.get(name);
         arg.setType(typeName);
     }
 
+    /**
+     * Set any number of short-form named flag arguments, specified in a single string starting with "-".
+     * Each flag's initial value will be set to false, and flags that are set using this method will only
+     * be accessible via the short-form name (e.g. "-a") that is provided in the parameter.
+     * 
+     * @param flag A string starting with "-" and followed by any number of characters, each of which will
+     *             be a new flag to be recognized by the ArgumentParser.
+     */
     public void setFlags(String flag) {
         if (flag.startsWith("-") && !flag.startsWith("--")) {
             for (int i = 1; i < flag.length(); i++) {
@@ -126,6 +157,17 @@ public class ArgumentParser {
         }
     }
 
+    /**
+     * Parses the values taken from the command line and sets them to their respective arguments. If the
+     * value "-h" or "--help" is detected, a help message will display to the user.
+     * 
+     * @param values                            string of values from the command line
+     * @throws UnrecognizedArgumentException    if an argument is provided that the ArgumentParser does not
+     *                                          recognize
+     * @throws MissingRequiredArgumentException if a required argument's value is not provided
+     * @throws InvalidTypeException             if an argument's value does not match its expected type
+     * @throws HelpException                    if the value "-h" or "--help" is provided
+     */
     public void setArgumentValues(String[] values) {
         Queue<String> queue = new ArrayDeque<>();
         for (String s : values) {
@@ -196,6 +238,11 @@ public class ArgumentParser {
         }
     }
 
+    /**
+     * Gets the name of the program whose arguments the ArgumentParser is parsing.
+     * 
+     * @return the name of the program
+     */
     public String getProgramName() {
         return programName;
     }
