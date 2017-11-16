@@ -54,6 +54,16 @@ public class ArgumentParser {
         }
     }
 
+    /**
+     * Assigns a short-form name to an Argument object. This method assumes that the argument object has already
+     * been created with its attributes (e.g. type, default value, description) set as desired. The method
+     * should be used when an Argument object has been fully defined and is ready to be given a nickname.
+     * 
+     * @param arg            Argument object to be given an alias and then set as an argument for the parser
+     * @param shortFormNames string starting with "-" that contains the desired short form name for the 
+     *                       Argument object. If the string contains multiple letters, each letter will be 
+     *                       assigned as an individual alias for the Argument object.
+     */
     public void setNamedArgument(Argument arg, String shortFormNames) {
         argumentMap.put(arg.getName(), arg);
         for (int i = 1; i < shortFormNames.length(); i++) {
@@ -78,7 +88,7 @@ public class ArgumentParser {
         if (flag.startsWith("-") && !flag.startsWith("--")) {
             for (int i = 1; i < flag.length(); i++) {
                 String name = "-" + Character.toString(flag.charAt(i));
-                if (!name.equals("-h")){
+                if (!name.equals("-h")) {
                     Argument shortFormFlag = new Argument(name);
                     shortFormFlag.setValue("false");
                     shortFormFlag.setType("boolean");
