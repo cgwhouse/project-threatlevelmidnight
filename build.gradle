@@ -31,6 +31,7 @@ task uberjar(type: OneJar) {
 javadoc {
 source = sourceSets.main.allJava
 classpath = configurations.compile
+exclude '**/keywords/**'
 }
 
 repositories {
