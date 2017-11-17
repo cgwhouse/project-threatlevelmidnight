@@ -4,6 +4,8 @@ import org.junit.*;
 
 import static org.junit.Assert.*;
 
+import java.awt.geom.FlatteningPathIterator;
+
 public class ArgumentParserTest {
     private ArgumentParser parser;
     String[] argumentNames = { "length", "width", "height" };
@@ -40,6 +42,15 @@ public class ArgumentParserTest {
         for (int i = 0; i < 3; i++) {
             assertEquals(argumentValues[i], parser.getValue(argumentNames[i]));
         }
+    }
+
+    @Test
+    public void testGetType() {
+        Argument floatArg = new Argument("test");
+        floatArg.setType("float");
+        parser.setArgument(floatArg);
+
+        assertEquals("float", parser.getType("test"));
     }
 
     @Test
