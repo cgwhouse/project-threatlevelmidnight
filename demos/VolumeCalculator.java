@@ -24,11 +24,12 @@ public class VolumeCalculator {
             if (args.length == 0) {
                 String helpMessage = "\n";
                 helpMessage += "java VolumeCalculator length width height\n\n";
-                helpMessage += "Example 1: VolumeCalculator 5 --type ellipsoid 4 3\n";
+                helpMessage += "Example 1: VolumeCalculator 5 -t ellipsoid 4 3 -as\n";
                 helpMessage += "The value of width is 4.\n";
                 helpMessage += "The type of length is float.\n";
-                helpMessage += "The value of --type is ellipsoid (default is square).\n";
+                helpMessage += "The value of --type is ellipsoid (default is box).\n";
                 helpMessage += "The short form of --type is -t.\n";
+                helpMessage += "-a adds 50 to the result and -s subtracts 75\n";
                 System.out.println(helpMessage);
                 String[] help = { "-h" };
                 parser.setArgumentValues(help);
