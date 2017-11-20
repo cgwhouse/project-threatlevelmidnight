@@ -11,10 +11,9 @@ public class ArgumentParser {
     private Map<String, String> shortFormMap;
 
     /** 
-     * Constructs an ArgumentParser object 
-     * which requires the program name as a string.
+     * Constructs an ArgumentParser object which requires the program name as a string.
      * 
-     * @param programName The name of the program.
+     * @param programName the name of the program
      */
     public ArgumentParser(String programName) {
         argumentNames = new ArrayList<String>();
@@ -28,7 +27,7 @@ public class ArgumentParser {
      * Sets the name of the program. This will change the program name from the default that is set
      * with the constructor.
      * 
-     * @param name The new name of the program as a string.
+     * @param name the new name of the program as a string
      */
     public void setProgramName(String name) {
         programName = name;
@@ -37,18 +36,17 @@ public class ArgumentParser {
     /** 
      * Sets the description of the program.
      * 
-     * @param description The description of the program as a string.
+     * @param description the description of the program as a string
      */
     public void setProgramDescription(String description) {
         programDescription = description;
     }
 
     /** 
-     * Sets the names of the arguments
-     * For each name in the array, an argument is created.
+     * Sets the names of the arguments. For each name in the array, an argument is created.
      * Note the argument <strong>"-h"</strong> is not allowed.
      * 
-     * @param names An array of names as strings.
+     * @param names an array of names as strings
      */
     public void setArguments(String[] names) {
         for (String name : names) {
@@ -75,9 +73,8 @@ public class ArgumentParser {
     }
 
     /** 
-     * Sets one argument.
-     * The given argument is set for the parser.
-     * Note the argument with name <strong>"-h"</strong> is not allowed.
+     * Sets one argument. The given argument is set for the parser. Note the argument with name 
+     * <strong>"-h"</strong> is not allowed.
      * 
      * @param arg the Argument object to be set
      * @see Argument
@@ -93,16 +90,17 @@ public class ArgumentParser {
     }
 
     /**
-     * Assigns a short-form name to an Argument object. This method assumes that the argument object has already
-     * been created with its attributes (e.g. type, default value, description) set as desired. The method
-     * should be used when an Argument object has been fully defined and is ready to be given a nickname.
+     * Assigns a short-form name to an Argument object. This method assumes that the argument object has 
+     * already been created with its attributes (e.g. type, default value, description) set as desired. 
+     * The method should be used when an Argument object has been fully defined and is ready to be given a
+     * nickname.
      * 
      * @param arg            Argument object to be given an alias and then set as an argument for the parser
      * @param shortFormNames string starting with "-" that contains the desired short form name for the 
      *                       Argument object. If the string contains multiple letters, each letter will be 
      *                       assigned as an individual alias for the Argument object.
      */
-    public void setNamedArgument(Argument arg, String shortFormNames) {
+    public void setNickname(Argument arg, String shortFormNames) {
         argumentMap.put(arg.getName(), arg);
         for (int i = 1; i < shortFormNames.length(); i++) {
             String name = "-" + Character.toString(shortFormNames.charAt(i));
@@ -116,8 +114,8 @@ public class ArgumentParser {
      * Sets an argument's description. The argument to be modified must already be known by the
      * ArgumentParser.
      * 
-     * @param name        The name of the argument whose description we want to set
-     * @param description The description to set
+     * @param name        the name of the argument whose description we want to set
+     * @param description the description to set
      */
     public void setArgumentDescription(String name, String description) {
         Argument arg = argumentMap.get(name);
@@ -127,8 +125,8 @@ public class ArgumentParser {
     /**
      * Sets an argument's type. The argument to be modified must already be known by the ArgumentParser.
      * 
-     * @param name     The name of the argument whose type we want to set
-     * @param typeName The type to set. Options are int, float, boolean, and string
+     * @param name     the name of the argument whose type we want to set
+     * @param typeName the type to set, options are int, float, boolean, and string
      */
     public void setArgumentType(String name, String typeName) {
         Argument arg = argumentMap.get(name);
@@ -140,7 +138,7 @@ public class ArgumentParser {
      * Each flag's initial value will be set to false, and flags that are set using this method will only
      * be accessible via the short-form name (e.g. "-a") that is provided in the parameter.
      * 
-     * @param flag A string starting with "-" and followed by any number of characters, each of which will
+     * @param flag a string starting with "-" and followed by any number of characters, each of which will
      *             be a new flag to be recognized by the ArgumentParser.
      */
     public void setFlags(String flag) {
@@ -148,8 +146,7 @@ public class ArgumentParser {
             for (int i = 1; i < flag.length(); i++) {
                 String name = "-" + Character.toString(flag.charAt(i));
                 if (!name.equals("-h")) {
-                    Argument shortFormFlag = new Argument(name);
-                    shortFormFlag.setValue("false");
+                    Argument shortFormFlag = new NamedArgument(name, "false");
                     shortFormFlag.setType("boolean");
                     argumentMap.put(name, shortFormFlag);
                 }
@@ -210,7 +207,6 @@ public class ArgumentParser {
                         flag.setValue("true");
                     } else if (shortFormMap.containsKey(arg)) {
                         Argument longForm = argumentMap.get(shortFormMap.get(arg));
-                        //ADD WHILE LOGIC TO CHOMP MORE VALUES IN FUTURE FEATURES
                         if (longForm.getType().equals("boolean")) {
                             longForm.setValue("true");
                         } else {

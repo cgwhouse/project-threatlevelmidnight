@@ -1,10 +1,7 @@
 package edu.wofford;
 
 import org.junit.*;
-
 import static org.junit.Assert.*;
-
-import java.awt.geom.FlatteningPathIterator;
 
 public class ArgumentParserTest {
     private ArgumentParser parser;
@@ -169,8 +166,7 @@ public class ArgumentParserTest {
     public void testDefaultArgumentsAcquiresNewValue() {
         String[] argumentValues = { "7", "5", "2", "--type", "square" };
 
-        Argument arg = new Argument("--type");
-        arg.setValue("ellipsoid");
+        Argument arg = new NamedArgument("--type", "ellipsoid");
 
         parser.setArguments(argumentNames);
         parser.setArgument(arg);
@@ -183,8 +179,7 @@ public class ArgumentParserTest {
     public void testDefaultArgumentRetainsDefaultValue() {
         String[] argumentValues = { "7", "5", "2" };
 
-        Argument arg = new Argument("--type");
-        arg.setValue("ellipsoid");
+        Argument arg = new NamedArgument("--type", "ellipsoid");
 
         parser.setArguments(argumentNames);
         parser.setArgument(arg);
@@ -197,8 +192,7 @@ public class ArgumentParserTest {
     public void testDefaultArgumentsOutOfOrder() {
         String[] argumentValues = { "7", "5", "--type", "square", "2" };
 
-        Argument arg = new Argument("--type");
-        arg.setValue("ellipsoid");
+        Argument arg = new NamedArgument("--type", "ellipsoid");
 
         parser.setArguments(argumentNames);
         parser.setArgument(arg);
@@ -212,9 +206,8 @@ public class ArgumentParserTest {
     public void testDefaultArgumentInvalidType() {
         String[] argumentValues = { "7", "5", "--digits", "square", "2" };
 
-        Argument arg = new Argument("--digits");
+        Argument arg = new NamedArgument("--digits", "1");
         arg.setType("int");
-        arg.setValue("1");
         parser.setArgument(arg);
         parser.setArguments(argumentNames);
 
@@ -230,9 +223,8 @@ public class ArgumentParserTest {
     public void testFlagIsSetWhenPresent() {
         String[] argumentValues = { "7", "5", "--test", "2" };
 
-        Argument arg = new Argument("--test");
+        Argument arg = new NamedArgument("--test", "false");
         arg.setType("boolean");
-        arg.setValue("false");
 
         parser.setArguments(argumentNames);
         parser.setArgument(arg);
@@ -246,12 +238,11 @@ public class ArgumentParserTest {
     public void testShortFormNames() {
         String[] argumentValues = { "7", "5", "-e", "2", "2" };
 
-        Argument arg = new Argument("--test");
+        Argument arg = new NamedArgument("--test", "1");
         arg.setType("int");
-        arg.setValue("1");
 
         parser.setArguments(argumentNames);
-        parser.setNamedArgument(arg, "-te");
+        parser.setNickname(arg, "-te");
 
         parser.setArgumentValues(argumentValues);
 
@@ -276,10 +267,9 @@ public class ArgumentParserTest {
                 parser.setArgumentDescription(argumentNames[i], argumentDescriptions[i]);
             }
 
-            Argument arg = new Argument("--hue");
+            Argument arg = new NamedArgument("--hue", "3");
             arg.setType("int");
-            arg.setValue("3");
-            parser.setNamedArgument(arg, "hue");
+            parser.setNickname(arg, "hue");
 
             parser.setArgumentValues(argumentValues);
         } catch (ArgumentException error) {
@@ -332,10 +322,9 @@ public class ArgumentParserTest {
     public void testBooleanSetTheLongWay() {
         String[] argumentValues = { "7", "5", "-t", "2" };
         parser.setArguments(argumentNames);
-        Argument boolArg = new Argument("--test");
+        Argument boolArg = new NamedArgument("--test", "false");
         boolArg.setType("boolean");
-        boolArg.setValue("false");
-        parser.setNamedArgument(boolArg, "-t");
+        parser.setNickname(boolArg, "-t");
         parser.setArgumentValues(argumentValues);
         assertEquals("true", parser.getValue("-t"));
         assertEquals("true", parser.getValue("--test"));
