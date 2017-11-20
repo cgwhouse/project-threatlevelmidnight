@@ -7,10 +7,8 @@ public class Feature04 {
 
     public void startProgramWithArguments(String[] args) {
         parser = new ArgumentParser("VolumeCalculator");
-        Argument typeArg = new Argument("--type");
-        Argument digitsArg = new Argument("--digits");
-        typeArg.setValue("box");
-        digitsArg.setValue("4");
+        Argument typeArg = new NamedArgument("--type", "box");
+        Argument digitsArg = new NamedArgument("--digits", "4");
         parser.setArgument(typeArg);
         parser.setArgument(digitsArg);
 

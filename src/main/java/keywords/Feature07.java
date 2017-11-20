@@ -7,13 +7,11 @@ public class Feature07 {
 
     public void startProgramWithArguments(String[] args) {
         parser = new ArgumentParser("VolumeCalculator");
-        Argument typeArg = new Argument("--type");
-        Argument digitsArg = new Argument("--digits");
-        typeArg.setValue("box");
-        digitsArg.setValue("4");
-        
-        parser.setNamedArgument(typeArg, "-t");
-        parser.setNamedArgument(digitsArg, "-d");
+        Argument typeArg = new NamedArgument("--type", "box");
+        Argument digitsArg = new NamedArgument("--digits", "4");
+
+        parser.setNickname(typeArg, "-t");
+        parser.setNickname(digitsArg, "-d");
 
         String[] names = { "length", "width", "height" };
         for (int i = 0; i < names.length; i++) {
