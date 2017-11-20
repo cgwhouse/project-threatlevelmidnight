@@ -166,7 +166,7 @@ public class ArgumentParserTest {
     public void testDefaultArgumentsAcquiresNewValue() {
         String[] argumentValues = { "7", "5", "2", "--type", "square" };
 
-        Argument arg = new NamedArgument("--type", "ellipsoid");
+        NamedArgument arg = new NamedArgument("--type", "ellipsoid");
 
         parser.setArguments(argumentNames);
         parser.setArgument(arg);
@@ -179,7 +179,7 @@ public class ArgumentParserTest {
     public void testDefaultArgumentRetainsDefaultValue() {
         String[] argumentValues = { "7", "5", "2" };
 
-        Argument arg = new NamedArgument("--type", "ellipsoid");
+        NamedArgument arg = new NamedArgument("--type", "ellipsoid");
 
         parser.setArguments(argumentNames);
         parser.setArgument(arg);
@@ -192,7 +192,7 @@ public class ArgumentParserTest {
     public void testDefaultArgumentsOutOfOrder() {
         String[] argumentValues = { "7", "5", "--type", "square", "2" };
 
-        Argument arg = new NamedArgument("--type", "ellipsoid");
+        NamedArgument arg = new NamedArgument("--type", "ellipsoid");
 
         parser.setArguments(argumentNames);
         parser.setArgument(arg);
@@ -206,7 +206,7 @@ public class ArgumentParserTest {
     public void testDefaultArgumentInvalidType() {
         String[] argumentValues = { "7", "5", "--digits", "square", "2" };
 
-        Argument arg = new NamedArgument("--digits", "1");
+        NamedArgument arg = new NamedArgument("--digits", "1");
         arg.setType("int");
         parser.setArgument(arg);
         parser.setArguments(argumentNames);
@@ -223,7 +223,7 @@ public class ArgumentParserTest {
     public void testFlagIsSetWhenPresent() {
         String[] argumentValues = { "7", "5", "--test", "2" };
 
-        Argument arg = new NamedArgument("--test", "false");
+        NamedArgument arg = new NamedArgument("--test", "false");
         arg.setType("boolean");
 
         parser.setArguments(argumentNames);
@@ -238,7 +238,7 @@ public class ArgumentParserTest {
     public void testShortFormNames() {
         String[] argumentValues = { "7", "5", "-e", "2", "2" };
 
-        Argument arg = new NamedArgument("--test", "1");
+        NamedArgument arg = new NamedArgument("--test", "1");
         arg.setType("int");
 
         parser.setArguments(argumentNames);
@@ -267,7 +267,7 @@ public class ArgumentParserTest {
                 parser.setArgumentDescription(argumentNames[i], argumentDescriptions[i]);
             }
 
-            Argument arg = new NamedArgument("--hue", "3");
+            NamedArgument arg = new NamedArgument("--hue", "3");
             arg.setType("int");
             parser.setNickname(arg, "hue");
 
@@ -322,7 +322,7 @@ public class ArgumentParserTest {
     public void testBooleanSetTheLongWay() {
         String[] argumentValues = { "7", "5", "-t", "2" };
         parser.setArguments(argumentNames);
-        Argument boolArg = new NamedArgument("--test", "false");
+        NamedArgument boolArg = new NamedArgument("--test", "false");
         boolArg.setType("boolean");
         parser.setNickname(boolArg, "-t");
         parser.setArgumentValues(argumentValues);

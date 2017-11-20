@@ -146,7 +146,7 @@ public class ArgumentParser {
             for (int i = 1; i < flag.length(); i++) {
                 String name = "-" + Character.toString(flag.charAt(i));
                 if (!name.equals("-h")) {
-                    Argument shortFormFlag = new NamedArgument(name, "false");
+                    NamedArgument shortFormFlag = new NamedArgument(name, "false");
                     shortFormFlag.setType("boolean");
                     argumentMap.put(name, shortFormFlag);
                 }
