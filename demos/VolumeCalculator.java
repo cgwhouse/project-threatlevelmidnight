@@ -14,10 +14,9 @@ public class VolumeCalculator {
             parser.setArgument(arg);
         }
 
-        Argument typeArg = new Argument("--type");
+        NamedArgument typeArg = new NamedArgument("--type", "square");
         typeArg.setType("string");
-        typeArg.setValue("square");
-        parser.setNamedArgument(typeArg, "-t");
+        parser.setNickname(typeArg, "-t");
 
         parser.setFlags("-as");
         try {
