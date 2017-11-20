@@ -1,7 +1,5 @@
 package edu.wofford;
 
-import java.util.*;
-
 public class Argument {
 
     private String name;
