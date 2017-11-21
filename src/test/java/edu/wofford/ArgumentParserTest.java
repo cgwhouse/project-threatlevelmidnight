@@ -1,5 +1,6 @@
 package edu.wofford;
 
+import java.io.File;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -328,5 +329,18 @@ public class ArgumentParserTest {
         parser.setArgumentValues(argumentValues);
         assertEquals("true", parser.getValue("-t"));
         assertEquals("true", parser.getValue("--test"));
+    }
+
+    @Test
+    public void testXMLParser() {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("testXMLParser.xml").getFile());
+        String[] argumentValues = { "7", "5", "-t", "ellipsoid", "2" };
+        parser.parseXML(file.getAbsolutePath());
+        parser.setArgumentValues(argumentValues);
+        assertEquals("7", parser.getValue("length"));
+        assertEquals("float", parser.getType("width"));
+        assertEquals("ellipsoid", parser.getValue("--type"));
+        assertEquals("4", parser.getValue("-d"));
     }
 }
