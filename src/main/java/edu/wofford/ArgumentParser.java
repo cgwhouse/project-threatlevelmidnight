@@ -6,6 +6,15 @@ import java.io.FileReader;
 import javax.xml.stream.*;
 import javax.xml.stream.events.*;
 
+/**
+ * ArgumentParser is a command-line parsing utility that is able to structure and create various options for various programs.
+ * 
+ * ArgumentParser is able to handle required arguments, named arguments and boolean flags.
+ * 
+ * Required arguments and named arguments can be of type string, integer, float, or boolean.
+ * 
+ * TODO: Include Examples Demonstrating the Above
+ */
 public class ArgumentParser {
 
     private List<String> argumentNames;
