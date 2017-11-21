@@ -1,6 +1,10 @@
 package edu.wofford;
 
 import java.util.*;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import javax.xml.stream.*;
+import javax.xml.stream.events.*;
 
 public class ArgumentParser {
 
@@ -325,5 +329,100 @@ public class ArgumentParser {
             return false;
         }
         return true;
+    }
+
+    public void parseXML(String filename) {
+        boolean bName = false;
+        boolean bType = false;
+        boolean bPosition = false;
+        boolean bShortname = false;
+        boolean bDefault = false;
+        int positionalCount = 0;
+        String name = "";
+        String type = "";
+        String position = "";
+        String shortname = "";
+        String mydefault = "";
+        Map<Integer, Argument> posMap = new HashMap<Integer, Argument>();
+        try {
+            XMLInputFactory factory = XMLInputFactory.newInstance();
+            XMLEventReader eventReader = factory.createXMLEventReader(new FileReader(filename));
+            while (eventReader.hasNext()) {
+                XMLEvent event = eventReader.nextEvent();
+                switch (event.getEventType()) {
+                case XMLStreamConstants.START_ELEMENT:
+                    StartElement startElement = event.asStartElement();
+                    String qName = startElement.getName().getLocalPart();
+                    if (qName.equalsIgnoreCase("name")) {
+                        bName = true;
+                    } else if (qName.equalsIgnoreCase("type")) {
+                        bType = true;
+                    } else if (qName.equalsIgnoreCase("position")) {
+                        bPosition = true;
+                    } else if (qName.equalsIgnoreCase("shortname")) {
+                        bShortname = true;
+                    } else if (qName.equalsIgnoreCase("default")) {
+                        bDefault = true;
+                    }
+                    break;
+                case XMLStreamConstants.CHARACTERS:
+                    Characters characters = event.asCharacters();
+                    if (bName) {
+                        name = characters.getData();
+                        bName = false;
+                    }
+                    if (bShortname) {
+                        shortname = characters.getData();
+                        bShortname = false;
+                    }
+                    if (bType) {
+                        type = characters.getData();
+                        bType = false;
+                    }
+                    if (bPosition) {
+                        position = characters.getData();
+                        bPosition = false;
+                    }
+                    if (bDefault) {
+                        mydefault = characters.getData();
+                        bDefault = false;
+                    }
+                    break;
+                case XMLStreamConstants.END_ELEMENT:
+                    EndElement endElement = event.asEndElement();
+                    if (endElement.getName().getLocalPart().equalsIgnoreCase("positional")
+                            || endElement.getName().getLocalPart().equalsIgnoreCase("named")) {
+                        if (endElement.getName().getLocalPart().equalsIgnoreCase("positional")) {
+                            positionalCount++;
+                            Argument arg = new Argument(name);
+                            arg.setType(type);
+                            posMap.put(Integer.parseInt(position), arg);
+                            position = "";
+                        } else if (endElement.getName().getLocalPart().equalsIgnoreCase("named")) {
+                            NamedArgument arg = new NamedArgument("--" + name, mydefault);
+                            arg.setType(type);
+                            if (!shortname.equals("")) {
+                                this.setNickname(arg, "-" + shortname);
+                                shortname = "";
+                            } else {
+                                this.setArgument(arg);
+                            }
+                            mydefault = "";
+                        }
+                        name = "";
+                        type = "";
+                    }
+                    break;
+                }
+            }
+            for (int i = 1; i < positionalCount + 1; i++) {
+                Argument arg = posMap.get(i);
+                this.setArgument(arg);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
+        }
     }
 }
