@@ -1,27 +1,29 @@
 package edu.wofford;
 
 import java.util.*;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import javax.xml.stream.*;
 import javax.xml.stream.events.*;
+import javax.xml.transform.*;
+import javax.xml.transform.stream.*;
+import java.text.SimpleDateFormat;
 
 /**
  * ArgumentParser is a command-line parsing utility that is able to structure and create various options for various programs.
- * 
+ * <p>
  * ArgumentParser is able to handle required arguments, named arguments and boolean flags.
- * 
  * Required arguments and named arguments can be of type string, integer, float, or boolean.
- * 
+ * <p>
  * TODO: Include Examples Demonstrating the Above
  */
 public class ArgumentParser {
 
-    private List<String> argumentNames;
+    private List<String> positionalArgs;
+    private List<String> namedArgs;
     private Map<String, Argument> argumentMap;
+    private Map<String, String> shortFormMap;
     private String programName;
     private String programDescription;
-    private Map<String, String> shortFormMap;
 
     /** 
      * Constructs an ArgumentParser object which requires the program name as a string.
@@ -29,7 +31,8 @@ public class ArgumentParser {
      * @param programName the name of the program
      */
     public ArgumentParser(String programName) {
-        argumentNames = new ArrayList<String>();
+        positionalArgs = new ArrayList<String>();
+        namedArgs = new ArrayList<String>();
         argumentMap = new HashMap<String, Argument>();
         shortFormMap = new HashMap<String, String>();
         this.programName = programName;
@@ -64,7 +67,7 @@ public class ArgumentParser {
     public void setArguments(String[] names) {
         for (String name : names) {
             if (!name.equals("-h")) {
-                argumentNames.add(name);
+                positionalArgs.add(name);
                 Argument arg = new Argument(name);
                 argumentMap.put(name, arg);
             }
@@ -79,7 +82,7 @@ public class ArgumentParser {
      */
     public void setArgument(String name) {
         if (!name.equals("-h")) {
-            argumentNames.add(name);
+            positionalArgs.add(name);
             Argument arg = new Argument(name);
             argumentMap.put(name, arg);
         }
@@ -96,7 +99,9 @@ public class ArgumentParser {
         String name = arg.getName();
         if (!name.equals("-h")) {
             if (!name.startsWith("--")) {
-                argumentNames.add(name);
+                positionalArgs.add(name);
+            } else {
+                namedArgs.add(name);
             }
             argumentMap.put(name, arg);
         }
@@ -113,12 +118,14 @@ public class ArgumentParser {
      *                       Argument object. If the string contains multiple letters, each letter will be 
      *                       assigned as an individual alias for the Argument object.
      */
-    public void setNickname(Argument arg, String shortFormNames) {
+    public void setNickname(NamedArgument arg, String shortFormNames) {
         argumentMap.put(arg.getName(), arg);
+        namedArgs.add(arg.getName());
         for (int i = 1; i < shortFormNames.length(); i++) {
             String name = "-" + Character.toString(shortFormNames.charAt(i));
             if (!name.equals("-h")) {
                 shortFormMap.put(name, arg.getName());
+                arg.addNickname(Character.toString(shortFormNames.charAt(i)));
             }
         }
     }
@@ -229,115 +236,22 @@ public class ArgumentParser {
                     }
                 }
             } else {
-                if (positionalIndex >= argumentNames.size()) {
+                if (positionalIndex >= positionalArgs.size()) {
                     msg += programName + ".java: error: unrecognized arguments: " + arg;
                     throw new UnrecognizedArgumentException(msg);
                 } else {
-                    String posName = argumentNames.get(positionalIndex);
+                    String posName = positionalArgs.get(positionalIndex);
                     positionalIndex++;
                     Argument current = argumentMap.get(posName);
                     checkAndSet(current, arg);
                 }
             }
         }
-        if (positionalIndex < argumentNames.size()) {
+        if (positionalIndex < positionalArgs.size()) {
             msg += programName + ".java: error: the following arguments are required: "
-                    + argumentNames.get(positionalIndex);
+                    + positionalArgs.get(positionalIndex);
             throw new MissingRequiredArgumentException(msg);
         }
-    }
-
-    /**
-     * Gets the name of the program whose arguments the ArgumentParser is parsing.
-     * 
-     * @return the name of the program
-     */
-    public String getProgramName() {
-        return programName;
-    }
-
-    /** 
-     * Gets the value of the argument with the associated name.
-     *
-     * @param name      the name of the variable whose value is wanted
-     * @return          string representation of the variable's value
-     */
-    public String getValue(String name) {
-        if (name.startsWith("-")) {
-            if (shortFormMap.containsKey(name)) {
-                name = shortFormMap.get(name);
-            }
-        }
-        Argument arg = argumentMap.get(name);
-        return arg.getValue();
-    }
-
-    /** 
-     * Gets the description of the argument with the associated name.
-     *
-     * @param name      the name of the variable whose description is wanted
-     * @return          string representation of the variable's description
-     */
-    public String getDescription(String name) {
-        Argument arg = argumentMap.get(name);
-        return arg.getDescription();
-    }
-
-    public String getType(String name) {
-        Argument arg = argumentMap.get(name);
-        return arg.getType();
-    }
-
-    private void help() {
-        String message = makeUsageMessage();
-        String decrArgs = "positional arguments:\n";
-        message += programDescription + "\n";
-        for (String name : argumentNames) {
-            Argument arg = argumentMap.get(name);
-            decrArgs += name + " " + arg.getDescription() + "\n";
-        }
-        message += decrArgs.trim();
-        throw new HelpException(message);
-    }
-
-    private String makeString(List<String> list) {
-        String result = "";
-        for (String item : list) {
-            result += item + " ";
-        }
-        return result.trim();
-    }
-
-    private String makeUsageMessage() {
-        return "usage: java " + programName + " " + makeString(argumentNames) + "\n";
-    }
-
-    private void checkAndSet(Argument current, String value) {
-        if (legitimateValue(current.getType(), value)) {
-            current.setValue(value);
-        } else {
-            String msg = makeUsageMessage();
-            msg += programName + ".java: error: argument " + current.getName() + ": invalid " + current.getType()
-                    + " value: " + value;
-            throw new InvalidTypeException(msg);
-        }
-    }
-
-    private boolean legitimateValue(String typeName, String value) {
-        try {
-            if (typeName.equals("int")) {
-                Integer.valueOf(value);
-            } else if (typeName.equals("float")) {
-                Float.valueOf(value);
-            } else if (typeName.equals("boolean")) {
-                Boolean.valueOf(value);
-            } else if (typeName.equals("string")) {
-                String.valueOf(value);
-            }
-        } catch (Exception ex) {
-            return false;
-        }
-        return true;
     }
 
     public void parseXML(String filename) {
@@ -433,5 +347,167 @@ public class ArgumentParser {
         } catch (XMLStreamException e) {
             e.printStackTrace();
         }
+    }
+
+    public String createXML(boolean createFile) {
+        try {
+            StringWriter stringWriter = new StringWriter();
+            XMLOutputFactory xMLOutputFactory = XMLOutputFactory.newInstance();
+            XMLStreamWriter x = xMLOutputFactory.createXMLStreamWriter(stringWriter);
+            int position = 1;
+            x.writeStartDocument();
+            x.writeStartElement("arguments");
+            for (String name : positionalArgs) {
+                Argument arg = argumentMap.get(name);
+                x.writeStartElement("positional");
+                x.writeStartElement("name");
+                x.writeCharacters(arg.getName());
+                x.writeEndElement();
+                x.writeStartElement("type");
+                x.writeCharacters(arg.getType());
+                x.writeEndElement();
+                x.writeStartElement("position");
+                x.writeCharacters(Integer.toString(position));
+                position++;
+                x.writeEndElement();
+                x.writeEndElement();
+            }
+            for (String name : namedArgs) {
+                NamedArgument arg = (NamedArgument) argumentMap.get(name);
+                x.writeStartElement("named");
+                x.writeStartElement("name");
+                x.writeCharacters(arg.getName().substring(2));
+                x.writeEndElement();
+                if (!arg.getNicknames().equals("-")) {
+                    for (int i = 1; i < arg.getNicknames().length(); i++) {
+                        x.writeStartElement("shortname");
+                        x.writeCharacters(Character.toString(arg.getNicknames().charAt(i)));
+                        x.writeEndElement();
+                    }
+                }
+                x.writeStartElement("type");
+                x.writeCharacters(arg.getType());
+                x.writeEndElement();
+                x.writeStartElement("default");
+                x.writeCharacters(arg.getValue());
+                x.writeEndElement();
+                x.writeEndElement();
+            }
+            x.writeEndElement();
+            x.writeEndDocument();
+            x.flush();
+            x.close();
+            String xmlString = stringWriter.getBuffer().toString();
+            stringWriter.close();
+            if (createFile) {
+                String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+                Source xmlInput = new StreamSource(new StringReader(xmlString));
+                StreamResult xmlOutput = new StreamResult(new StringWriter());
+                Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+                transformer.transform(xmlInput, xmlOutput);
+                PrintWriter out = new PrintWriter("xml-" + timeStamp + ".xml");
+                out.print(xmlOutput.getWriter().toString());
+                out.close();
+            }
+            return xmlString;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    /**
+     * Gets the name of the program whose arguments the ArgumentParser is parsing.
+     * 
+     * @return the name of the program
+     */
+    public String getProgramName() {
+        return programName;
+    }
+
+    /** 
+     * Gets the value of the argument with the associated name.
+     *
+     * @param name      the name of the variable whose value is wanted
+     * @return          string representation of the variable's value
+     */
+    public String getValue(String name) {
+        if (name.startsWith("-")) {
+            if (shortFormMap.containsKey(name)) {
+                name = shortFormMap.get(name);
+            }
+        }
+        Argument arg = argumentMap.get(name);
+        return arg.getValue();
+    }
+
+    /** 
+     * Gets the description of the argument with the associated name.
+     *
+     * @param name      the name of the variable whose description is wanted
+     * @return          string representation of the variable's description
+     */
+    public String getDescription(String name) {
+        Argument arg = argumentMap.get(name);
+        return arg.getDescription();
+    }
+
+    public String getType(String name) {
+        Argument arg = argumentMap.get(name);
+        return arg.getType();
+    }
+
+    private void help() {
+        String message = makeUsageMessage();
+        String decrArgs = "positional arguments:\n";
+        message += programDescription + "\n";
+        for (String name : positionalArgs) {
+            Argument arg = argumentMap.get(name);
+            decrArgs += name + " " + arg.getDescription() + "\n";
+        }
+        message += decrArgs.trim();
+        throw new HelpException(message);
+    }
+
+    private String makeString(List<String> list) {
+        String result = "";
+        for (String item : list) {
+            result += item + " ";
+        }
+        return result.trim();
+    }
+
+    private String makeUsageMessage() {
+        return "usage: java " + programName + " " + makeString(positionalArgs) + "\n";
+    }
+
+    private void checkAndSet(Argument current, String value) {
+        if (legitimateValue(current.getType(), value)) {
+            current.setValue(value);
+        } else {
+            String msg = makeUsageMessage();
+            msg += programName + ".java: error: argument " + current.getName() + ": invalid " + current.getType()
+                    + " value: " + value;
+            throw new InvalidTypeException(msg);
+        }
+    }
+
+    private boolean legitimateValue(String typeName, String value) {
+        try {
+            if (typeName.equals("int")) {
+                Integer.valueOf(value);
+            } else if (typeName.equals("float")) {
+                Float.valueOf(value);
+            } else if (typeName.equals("boolean")) {
+                Boolean.valueOf(value);
+            } else if (typeName.equals("string")) {
+                String.valueOf(value);
+            }
+        } catch (Exception ex) {
+            return false;
+        }
+        return true;
     }
 }

@@ -343,4 +343,28 @@ public class ArgumentParserTest {
         assertEquals("ellipsoid", parser.getValue("--type"));
         assertEquals("4", parser.getValue("-d"));
     }
+
+    @Test
+    public void testXMLCreator() {
+        String expected = "<?xml version=\"1.0\" ?><arguments>";
+        expected += "<positional><name>length</name><type>float</type><position>1</position></positional>";
+        expected += "<positional><name>width</name><type>float</type><position>2</position></positional>";
+        expected += "<positional><name>height</name><type>float</type><position>3</position></positional>";
+        expected += "<named><name>type</name><shortname>t</shortname><type>string</type><default>box</default></named>";
+        expected += "<named><name>digits</name><shortname>d</shortname><type>integer</type><default>4</default></named>";
+        expected += "</arguments>";
+        for (int i = 0; i < argumentNames.length; i++) {
+            Argument arg = new Argument(argumentNames[i]);
+            arg.setType("float");
+            parser.setArgument(arg);
+        }
+        NamedArgument typeArg = new NamedArgument("--type", "box");
+        typeArg.setType("string");
+        parser.setNickname(typeArg, "-t");
+        NamedArgument digitsArg = new NamedArgument("--digits", "4");
+        digitsArg.setType("integer");
+        parser.setNickname(digitsArg, "-d");
+        String result = parser.createXML(false);
+        assertEquals(expected, result);
+    }
 }
