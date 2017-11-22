@@ -14,11 +14,14 @@ public class VolumeCalculator {
             parser.setArgument(arg);
         }
 
-        NamedArgument typeArg = new NamedArgument("--type", "square");
+        NamedArgument typeArg = new NamedArgument("--type", "box");
         typeArg.setType("string");
         parser.setNickname(typeArg, "-t");
+        NamedArgument digitsArg = new NamedArgument("--digits", "4");
+        digitsArg.setType("integer");
+        parser.setNickname(digitsArg, "-d");
 
-        parser.setFlags("-as");
+        parser.setFlags("-asx");
         try {
             if (args.length == 0) {
                 String helpMessage = "\n";
@@ -28,7 +31,8 @@ public class VolumeCalculator {
                 helpMessage += "The type of length is float.\n";
                 helpMessage += "The value of --type is ellipsoid (default is box).\n";
                 helpMessage += "The short form of --type is -t.\n";
-                helpMessage += "-a adds 50 to the result and -s subtracts 75\n";
+                helpMessage += "-a adds 50 to the result and -s subtracts 75.\n";
+                helpMessage += "-x creates a file containing the argument information in xml format.\n";
                 System.out.println(helpMessage);
                 String[] help = { "-h" };
                 parser.setArgumentValues(help);
@@ -49,6 +53,9 @@ public class VolumeCalculator {
                 }
                 if (parser.getValue("-s").equals("true")) {
                     result -= 75;
+                }
+                if (parser.getValue("-x").equals("true")) {
+                    parser.createXML(true);
                 }
                 System.out.println(result);
             }
