@@ -23,7 +23,7 @@ public class NamedArgument extends Argument {
     }
 
     /** 
-     * Adds the nickname to the Argument.
+     * Adds a short-form name to the Argument.
      * 
      * @param nickname the nickname of the Argument as a string
      */
@@ -32,8 +32,9 @@ public class NamedArgument extends Argument {
     }
 
     /** 
-     * Gets the nicknames of the Argument.
+     * Gets each short-form name for the Argument.
      * 
+     * @return a single string containing a "-" followed by each of the short-form names for the Argument
      */
     public String getNicknames() {
         return nicknames;

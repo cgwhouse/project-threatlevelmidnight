@@ -3,7 +3,7 @@ package edu.wofford;
 /**
  * Argument is a structure used by ArgumentParser.
  * <p>
- * Argument objects have a name, a value, a description, and a type..
+ * Argument objects have a name, a value, a description, and a type.
  * <p>
  * TODO: Include Examples Demonstrating the Above
  */
@@ -56,6 +56,7 @@ public class Argument {
     /** 
      * Gets the name of the Argument.
      * 
+     * @return string representing the name of the Argument
      */
     public String getName() {
         return name;
@@ -64,6 +65,7 @@ public class Argument {
     /** 
      * Gets the value of the Argument.
      * 
+     * @return string representing the value of the Argument
      */
     public String getValue() {
         return value;
@@ -72,6 +74,7 @@ public class Argument {
     /** 
      * Gets the description of the Argument.
      * 
+     * @return string representing the description of the Argument
      */
     public String getDescription() {
         return description;
@@ -80,6 +83,7 @@ public class Argument {
     /** 
      * Gets the type of the Argument.
      * 
+     * @return string representing the type of the Argument
      */
     public String getType() {
         return type;
