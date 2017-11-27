@@ -254,6 +254,11 @@ public class ArgumentParser {
         }
     }
 
+    /**
+     * Reads argument information from an XML file and adds them to the ArgumentParser object's known arguments.
+     * 
+     * @param filename the name of the file to read from
+     */
     public void parseXML(String filename) {
         boolean bName = false;
         boolean bType = false;
@@ -349,67 +354,74 @@ public class ArgumentParser {
         }
     }
 
+    /**
+     * Creates a string that contains all of the parser's argument information, formatted as XML.
+     * 
+     * @param createFile if true, XML string is written to a newly created file in the current directory
+     * @return           string of parser's argument information formatted as XML
+     */
     public String createXML(boolean createFile) {
         try {
             StringWriter stringWriter = new StringWriter();
             XMLOutputFactory xMLOutputFactory = XMLOutputFactory.newInstance();
-            XMLStreamWriter x = xMLOutputFactory.createXMLStreamWriter(stringWriter);
+            XMLStreamWriter xmlStreamWriter = xMLOutputFactory.createXMLStreamWriter(stringWriter);
             int position = 1;
-            x.writeStartDocument();
-            x.writeStartElement("arguments");
+            xmlStreamWriter.writeStartDocument();
+            xmlStreamWriter.writeStartElement("arguments");
             for (String name : positionalArgs) {
                 Argument arg = argumentMap.get(name);
-                x.writeStartElement("positional");
-                x.writeStartElement("name");
-                x.writeCharacters(arg.getName());
-                x.writeEndElement();
-                x.writeStartElement("type");
-                x.writeCharacters(arg.getType());
-                x.writeEndElement();
-                x.writeStartElement("position");
-                x.writeCharacters(Integer.toString(position));
+                xmlStreamWriter.writeStartElement("positional");
+                xmlStreamWriter.writeStartElement("name");
+                xmlStreamWriter.writeCharacters(arg.getName());
+                xmlStreamWriter.writeEndElement();
+                xmlStreamWriter.writeStartElement("type");
+                xmlStreamWriter.writeCharacters(arg.getType());
+                xmlStreamWriter.writeEndElement();
+                xmlStreamWriter.writeStartElement("position");
+                xmlStreamWriter.writeCharacters(Integer.toString(position));
                 position++;
-                x.writeEndElement();
-                x.writeEndElement();
+                xmlStreamWriter.writeEndElement();
+                xmlStreamWriter.writeEndElement();
             }
             for (String name : namedArgs) {
                 NamedArgument arg = (NamedArgument) argumentMap.get(name);
-                x.writeStartElement("named");
-                x.writeStartElement("name");
-                x.writeCharacters(arg.getName().substring(2));
-                x.writeEndElement();
+                xmlStreamWriter.writeStartElement("named");
+                xmlStreamWriter.writeStartElement("name");
+                xmlStreamWriter.writeCharacters(arg.getName().substring(2));
+                xmlStreamWriter.writeEndElement();
                 if (!arg.getNicknames().equals("-")) {
                     for (int i = 1; i < arg.getNicknames().length(); i++) {
-                        x.writeStartElement("shortname");
-                        x.writeCharacters(Character.toString(arg.getNicknames().charAt(i)));
-                        x.writeEndElement();
+                        xmlStreamWriter.writeStartElement("shortname");
+                        xmlStreamWriter.writeCharacters(Character.toString(arg.getNicknames().charAt(i)));
+                        xmlStreamWriter.writeEndElement();
                     }
                 }
-                x.writeStartElement("type");
-                x.writeCharacters(arg.getType());
-                x.writeEndElement();
-                x.writeStartElement("default");
-                x.writeCharacters(arg.getValue());
-                x.writeEndElement();
-                x.writeEndElement();
+                xmlStreamWriter.writeStartElement("type");
+                xmlStreamWriter.writeCharacters(arg.getType());
+                xmlStreamWriter.writeEndElement();
+                xmlStreamWriter.writeStartElement("default");
+                xmlStreamWriter.writeCharacters(arg.getValue());
+                xmlStreamWriter.writeEndElement();
+                xmlStreamWriter.writeEndElement();
             }
-            x.writeEndElement();
-            x.writeEndDocument();
-            x.flush();
-            x.close();
-            String xmlString = stringWriter.getBuffer().toString();
+            xmlStreamWriter.writeEndElement();
+            xmlStreamWriter.writeEndDocument();
+            xmlStreamWriter.flush();
+            xmlStreamWriter.close();
+            String xmlString = stringWriter.getBuffer().toString().replace("<?xml version=\"1.0\" ?>", "");
             stringWriter.close();
             if (createFile) {
-                String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
                 Source xmlInput = new StreamSource(new StringReader(xmlString));
                 StreamResult xmlOutput = new StreamResult(new StringWriter());
                 Transformer transformer = TransformerFactory.newInstance().newTransformer();
                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
                 transformer.transform(xmlInput, xmlOutput);
-                PrintWriter out = new PrintWriter("xml-" + timeStamp + ".xml");
+                String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+                PrintWriter out = new PrintWriter("tmp.xml");
                 out.print(xmlOutput.getWriter().toString());
                 out.close();
+                replaceBadXML(timeStamp);
             }
             return xmlString;
         } catch (Exception e) {
@@ -430,8 +442,8 @@ public class ArgumentParser {
     /** 
      * Gets the value of the argument with the associated name.
      *
-     * @param name      the name of the variable whose value is wanted
-     * @return          string representation of the variable's value
+     * @param name      the name of the argument whose value is wanted
+     * @return          string representation of the argument's value
      */
     public String getValue(String name) {
         if (name.startsWith("-")) {
@@ -446,14 +458,20 @@ public class ArgumentParser {
     /** 
      * Gets the description of the argument with the associated name.
      *
-     * @param name      the name of the variable whose description is wanted
-     * @return          string representation of the variable's description
+     * @param name      the name of the argument whose description is wanted
+     * @return          string representation of the argument's description
      */
     public String getDescription(String name) {
         Argument arg = argumentMap.get(name);
         return arg.getDescription();
     }
 
+    /**
+     * Gets the type of the argument with the associated name.
+     * 
+     * @param name the name of the argument whose type is wanted
+     * @return     string representation of the argument's type
+     */
     public String getType(String name) {
         Argument arg = argumentMap.get(name);
         return arg.getType();
@@ -509,5 +527,40 @@ public class ArgumentParser {
             return false;
         }
         return true;
+    }
+
+    private void replaceBadXML(String timeStamp) {
+        String oldFileName = "tmp.xml";
+        String newFileName = "xml-" + timeStamp + ".xml";
+
+        BufferedReader br = null;
+        BufferedWriter bw = null;
+        try {
+            br = new BufferedReader(new FileReader(oldFileName));
+            bw = new BufferedWriter(new FileWriter(newFileName));
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.contains("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"))
+                    line = line.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "");
+                bw.write(line + "\n");
+            }
+        } catch (Exception e) {
+            return;
+        } finally {
+            try {
+                if (br != null)
+                    br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (bw != null)
+                    bw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        File oldFile = new File(oldFileName);
+        oldFile.delete();
     }
 }

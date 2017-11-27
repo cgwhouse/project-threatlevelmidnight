@@ -346,7 +346,7 @@ public class ArgumentParserTest {
 
     @Test
     public void testXMLCreator() {
-        String expected = "<?xml version=\"1.0\" ?><arguments>";
+        String expected = "<arguments>";
         expected += "<positional><name>length</name><type>float</type><position>1</position></positional>";
         expected += "<positional><name>width</name><type>float</type><position>2</position></positional>";
         expected += "<positional><name>height</name><type>float</type><position>3</position></positional>";
