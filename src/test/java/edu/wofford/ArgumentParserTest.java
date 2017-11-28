@@ -351,7 +351,7 @@ public class ArgumentParserTest {
         expected += "<positional><name>width</name><type>float</type><position>2</position></positional>";
         expected += "<positional><name>height</name><type>float</type><position>3</position></positional>";
         expected += "<named><name>type</name><shortname>t</shortname><type>string</type><default>box</default></named>";
-        expected += "<named><name>digits</name><shortname>d</shortname><type>integer</type><default>4</default></named>";
+        expected += "<named><name>digits</name><type>integer</type><default>4</default></named>";
         expected += "</arguments>";
         for (int i = 0; i < argumentNames.length; i++) {
             Argument arg = new Argument(argumentNames[i]);
@@ -363,8 +363,24 @@ public class ArgumentParserTest {
         parser.setNickname(typeArg, "-t");
         NamedArgument digitsArg = new NamedArgument("--digits", "4");
         digitsArg.setType("integer");
-        parser.setNickname(digitsArg, "-d");
+        parser.setArgument(digitsArg);
         String result = parser.createXML(false);
         assertEquals(expected, result);
+    }
+
+    @Test
+    public void testAcceptedValuesOnly() {
+        try {
+        String[] argumentValues = { "7", "5", "-t", "vape", "2" };
+        parser.setArguments(argumentNames);
+
+        NamedArgument typeArg = new NamedArgument("--type", "box");
+        String[] accepted = {"box", "ellipsoid", "pyramid"};
+        typeArg.setAcceptedValues(accepted);
+        parser.setArgumentValues(argumentValues);
+        } catch (UnacceptedValueException e) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: argument --type: invalid string value: vape";
+            assertEquals(message, e.getMessage());
+        }
     }
 }

@@ -456,6 +456,7 @@ public class ArgumentParser {
         return "usage: java " + programName + " " + makeString(positionalArgs) + "\n";
     }
 
+    //TODO add the restricted value checking to this method
     private void checkAndSet(Argument current, String value) {
         if (legitimateValue(current.getType(), value)) {
             current.setValue(value);
@@ -498,24 +499,18 @@ public class ArgumentParser {
                     line = line.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "");
                 bw.write(line + "\n");
             }
-        } catch (Exception e) {
-            return;
-        } finally {
-            try {
-                if (br != null)
-                    br.close();
-            } catch (IOException e) {
-                throw new BadXMLException();
+            if (br != null) {
+                br.close();
             }
-            try {
-                if (bw != null)
-                    bw.close();
-            } catch (IOException e) {
-                throw new BadXMLException();
+            if (bw != null) {
+                bw.close();
             }
+            File oldFile = new File(oldFileName);
+            oldFile.delete();
+        } catch (IOException e) {
+            throw new BadXMLException();
         }
-        File oldFile = new File(oldFileName);
-        oldFile.delete();
+
     }
 
     private void writePositionalXML(String name, XMLStreamWriter writer, int position) {

@@ -1,5 +1,8 @@
 package edu.wofford;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Argument is a structure used by ArgumentParser.
  * <p>
@@ -18,6 +21,7 @@ public class Argument {
     private String value;
     private String description;
     private String type;
+    private Set<String> accepted;
 
     /** 
      * Constructs an Argument object which requires the Argument name as a string.
@@ -29,6 +33,7 @@ public class Argument {
         value = "";
         description = "";
         type = "";
+        accepted = new HashSet<String>();
     }
 
     /** 
@@ -56,6 +61,15 @@ public class Argument {
      */
     public void setType(String type) {
         this.type = type;
+    }
+
+    /**
+     * Sets the values that an Argument can be set to. If no values are set, then the argument accepts all 
+     * values that are valid for its type.
+     * 
+     * @param values string array of values that the Argument can be set to
+     */
+    public void setAcceptedValues(String[] values) {
     }
 
     /** 
