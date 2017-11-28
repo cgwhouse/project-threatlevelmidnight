@@ -39,6 +39,7 @@ public class ArgumentParser {
         programDescription = "";
     }
 
+    //region Gets and Sets
     /** 
      * Sets the name of the program. This will change the program name from the default that is set
      * with the constructor.
@@ -175,6 +176,54 @@ public class ArgumentParser {
     }
 
     /**
+    * Gets the name of the program whose arguments the ArgumentParser is parsing.
+    * 
+    * @return the name of the program
+    */
+    public String getProgramName() {
+        return programName;
+    }
+
+    /** 
+     * Gets the value of the argument with the associated name.
+     *
+     * @param name      the name of the argument whose value is wanted
+     * @return          string representation of the argument's value
+     */
+    public String getValue(String name) {
+        if (name.startsWith("-")) {
+            if (shortFormMap.containsKey(name)) {
+                name = shortFormMap.get(name);
+            }
+        }
+        Argument arg = argumentMap.get(name);
+        return arg.getValue();
+    }
+
+    /** 
+     * Gets the description of the argument with the associated name.
+     *
+     * @param name      the name of the argument whose description is wanted
+     * @return          string representation of the argument's description
+     */
+    public String getDescription(String name) {
+        Argument arg = argumentMap.get(name);
+        return arg.getDescription();
+    }
+
+    /**
+     * Gets the type of the argument with the associated name.
+     * 
+     * @param name the name of the argument whose type is wanted
+     * @return     string representation of the argument's type
+     */
+    public String getType(String name) {
+        Argument arg = argumentMap.get(name);
+        return arg.getType();
+    }
+    //endregion
+
+    /**
      * Parses the values taken from the command line and sets them to their respective arguments. If the
      * value "-h" or "--help" is detected, a help message will display to the user.
      * 
@@ -260,18 +309,14 @@ public class ArgumentParser {
      * @param filename the name of the file to read from
      */
     public void parseXML(String filename) {
-        boolean bName = false;
-        boolean bType = false;
-        boolean bPosition = false;
-        boolean bShortname = false;
-        boolean bDefault = false;
         int positionalCount = 0;
-        String name = "";
-        String type = "";
-        String position = "";
-        String shortname = "";
-        String mydefault = "";
+        String[] fields = { "name", "shortname", "type", "position", "default" };
+        Set<String> set = new HashSet<String>(Arrays.asList(fields));
         Map<Integer, Argument> posMap = new HashMap<Integer, Argument>();
+        Map<String, String> attMap = new HashMap<String, String>();
+        for (int i = 0; i < fields.length; i++) {
+            attMap.put(fields[i], "");
+        }
         try {
             XMLInputFactory factory = XMLInputFactory.newInstance();
             XMLEventReader eventReader = factory.createXMLEventReader(new FileReader(filename));
@@ -280,40 +325,9 @@ public class ArgumentParser {
                 switch (event.getEventType()) {
                 case XMLStreamConstants.START_ELEMENT:
                     StartElement startElement = event.asStartElement();
-                    String qName = startElement.getName().getLocalPart();
-                    if (qName.equalsIgnoreCase("name")) {
-                        bName = true;
-                    } else if (qName.equalsIgnoreCase("type")) {
-                        bType = true;
-                    } else if (qName.equalsIgnoreCase("position")) {
-                        bPosition = true;
-                    } else if (qName.equalsIgnoreCase("shortname")) {
-                        bShortname = true;
-                    } else if (qName.equalsIgnoreCase("default")) {
-                        bDefault = true;
-                    }
-                    break;
-                case XMLStreamConstants.CHARACTERS:
-                    Characters characters = event.asCharacters();
-                    if (bName) {
-                        name = characters.getData();
-                        bName = false;
-                    }
-                    if (bShortname) {
-                        shortname = characters.getData();
-                        bShortname = false;
-                    }
-                    if (bType) {
-                        type = characters.getData();
-                        bType = false;
-                    }
-                    if (bPosition) {
-                        position = characters.getData();
-                        bPosition = false;
-                    }
-                    if (bDefault) {
-                        mydefault = characters.getData();
-                        bDefault = false;
+                    String qName = startElement.getName().getLocalPart().toLowerCase();
+                    if (set.contains(qName)) {
+                        handleCharacters(qName, eventReader.nextEvent(), attMap);
                     }
                     break;
                 case XMLStreamConstants.END_ELEMENT:
@@ -322,23 +336,10 @@ public class ArgumentParser {
                             || endElement.getName().getLocalPart().equalsIgnoreCase("named")) {
                         if (endElement.getName().getLocalPart().equalsIgnoreCase("positional")) {
                             positionalCount++;
-                            Argument arg = new Argument(name);
-                            arg.setType(type);
-                            posMap.put(Integer.parseInt(position), arg);
-                            position = "";
+                            setPositionalFromXML(attMap, posMap);
                         } else if (endElement.getName().getLocalPart().equalsIgnoreCase("named")) {
-                            NamedArgument arg = new NamedArgument("--" + name, mydefault);
-                            arg.setType(type);
-                            if (!shortname.equals("")) {
-                                this.setNickname(arg, "-" + shortname);
-                                shortname = "";
-                            } else {
-                                this.setArgument(arg);
-                            }
-                            mydefault = "";
+                            setNamedFromXML(attMap);
                         }
-                        name = "";
-                        type = "";
                     }
                     break;
                 }
@@ -347,10 +348,8 @@ public class ArgumentParser {
                 Argument arg = posMap.get(i);
                 this.setArgument(arg);
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (XMLStreamException e) {
-            e.printStackTrace();
+        } catch (FileNotFoundException | XMLStreamException e) {
+            throw new BadXMLException();
         }
     }
 
@@ -369,40 +368,11 @@ public class ArgumentParser {
             xmlStreamWriter.writeStartDocument();
             xmlStreamWriter.writeStartElement("arguments");
             for (String name : positionalArgs) {
-                Argument arg = argumentMap.get(name);
-                xmlStreamWriter.writeStartElement("positional");
-                xmlStreamWriter.writeStartElement("name");
-                xmlStreamWriter.writeCharacters(arg.getName());
-                xmlStreamWriter.writeEndElement();
-                xmlStreamWriter.writeStartElement("type");
-                xmlStreamWriter.writeCharacters(arg.getType());
-                xmlStreamWriter.writeEndElement();
-                xmlStreamWriter.writeStartElement("position");
-                xmlStreamWriter.writeCharacters(Integer.toString(position));
+                writePositionalXML(name, xmlStreamWriter, position);
                 position++;
-                xmlStreamWriter.writeEndElement();
-                xmlStreamWriter.writeEndElement();
             }
             for (String name : namedArgs) {
-                NamedArgument arg = (NamedArgument) argumentMap.get(name);
-                xmlStreamWriter.writeStartElement("named");
-                xmlStreamWriter.writeStartElement("name");
-                xmlStreamWriter.writeCharacters(arg.getName().substring(2));
-                xmlStreamWriter.writeEndElement();
-                if (!arg.getNicknames().equals("-")) {
-                    for (int i = 1; i < arg.getNicknames().length(); i++) {
-                        xmlStreamWriter.writeStartElement("shortname");
-                        xmlStreamWriter.writeCharacters(Character.toString(arg.getNicknames().charAt(i)));
-                        xmlStreamWriter.writeEndElement();
-                    }
-                }
-                xmlStreamWriter.writeStartElement("type");
-                xmlStreamWriter.writeCharacters(arg.getType());
-                xmlStreamWriter.writeEndElement();
-                xmlStreamWriter.writeStartElement("default");
-                xmlStreamWriter.writeCharacters(arg.getValue());
-                xmlStreamWriter.writeEndElement();
-                xmlStreamWriter.writeEndElement();
+                writeNamedXML(name, xmlStreamWriter);
             }
             xmlStreamWriter.writeEndElement();
             xmlStreamWriter.writeEndDocument();
@@ -411,72 +381,15 @@ public class ArgumentParser {
             String xmlString = stringWriter.getBuffer().toString().replace("<?xml version=\"1.0\" ?>", "");
             stringWriter.close();
             if (createFile) {
-                Source xmlInput = new StreamSource(new StringReader(xmlString));
-                StreamResult xmlOutput = new StreamResult(new StringWriter());
-                Transformer transformer = TransformerFactory.newInstance().newTransformer();
-                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-                transformer.transform(xmlInput, xmlOutput);
-                String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
-                PrintWriter out = new PrintWriter("tmp.xml");
-                out.print(xmlOutput.getWriter().toString());
-                out.close();
-                replaceBadXML(timeStamp);
+                createXMLFile(xmlString);
             }
             return xmlString;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException | XMLStreamException e) {
+            throw new BadXMLException();
         }
-        return "";
     }
 
-    /**
-     * Gets the name of the program whose arguments the ArgumentParser is parsing.
-     * 
-     * @return the name of the program
-     */
-    public String getProgramName() {
-        return programName;
-    }
-
-    /** 
-     * Gets the value of the argument with the associated name.
-     *
-     * @param name      the name of the argument whose value is wanted
-     * @return          string representation of the argument's value
-     */
-    public String getValue(String name) {
-        if (name.startsWith("-")) {
-            if (shortFormMap.containsKey(name)) {
-                name = shortFormMap.get(name);
-            }
-        }
-        Argument arg = argumentMap.get(name);
-        return arg.getValue();
-    }
-
-    /** 
-     * Gets the description of the argument with the associated name.
-     *
-     * @param name      the name of the argument whose description is wanted
-     * @return          string representation of the argument's description
-     */
-    public String getDescription(String name) {
-        Argument arg = argumentMap.get(name);
-        return arg.getDescription();
-    }
-
-    /**
-     * Gets the type of the argument with the associated name.
-     * 
-     * @param name the name of the argument whose type is wanted
-     * @return     string representation of the argument's type
-     */
-    public String getType(String name) {
-        Argument arg = argumentMap.get(name);
-        return arg.getType();
-    }
-
+    //region Private Methods
     private void help() {
         String message = makeUsageMessage();
         String decrArgs = "positional arguments:\n";
@@ -532,7 +445,6 @@ public class ArgumentParser {
     private void replaceBadXML(String timeStamp) {
         String oldFileName = "tmp.xml";
         String newFileName = "xml-" + timeStamp + ".xml";
-
         BufferedReader br = null;
         BufferedWriter bw = null;
         try {
@@ -551,16 +463,101 @@ public class ArgumentParser {
                 if (br != null)
                     br.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new BadXMLException();
             }
             try {
                 if (bw != null)
                     bw.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new BadXMLException();
             }
         }
         File oldFile = new File(oldFileName);
         oldFile.delete();
     }
+
+    private void writePositionalXML(String name, XMLStreamWriter writer, int position) {
+        try {
+            Argument arg = argumentMap.get(name);
+            writer.writeStartElement("positional");
+            writer.writeStartElement("name");
+            writer.writeCharacters(arg.getName());
+            writer.writeEndElement();
+            writer.writeStartElement("type");
+            writer.writeCharacters(arg.getType());
+            writer.writeEndElement();
+            writer.writeStartElement("position");
+            writer.writeCharacters(Integer.toString(position));
+            writer.writeEndElement();
+            writer.writeEndElement();
+        } catch (XMLStreamException e) {
+            throw new BadXMLException();
+        }
+    }
+
+    private void writeNamedXML(String name, XMLStreamWriter writer) {
+        NamedArgument arg = (NamedArgument) argumentMap.get(name);
+        try {
+            writer.writeStartElement("named");
+            writer.writeStartElement("name");
+            writer.writeCharacters(arg.getName().substring(2));
+            writer.writeEndElement();
+            if (!arg.getNicknames().equals("-")) {
+                for (int i = 1; i < arg.getNicknames().length(); i++) {
+                    writer.writeStartElement("shortname");
+                    writer.writeCharacters(Character.toString(arg.getNicknames().charAt(i)));
+                    writer.writeEndElement();
+                }
+            }
+            writer.writeStartElement("type");
+            writer.writeCharacters(arg.getType());
+            writer.writeEndElement();
+            writer.writeStartElement("default");
+            writer.writeCharacters(arg.getValue());
+            writer.writeEndElement();
+            writer.writeEndElement();
+        } catch (XMLStreamException e) {
+            throw new BadXMLException();
+        }
+    }
+
+    private void createXMLFile(String xml) {
+        try {
+            Source xmlInput = new StreamSource(new StringReader(xml));
+            StreamResult xmlOutput = new StreamResult(new StringWriter());
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+            transformer.transform(xmlInput, xmlOutput);
+            String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+            PrintWriter out = new PrintWriter("tmp.xml");
+            out.print(xmlOutput.getWriter().toString());
+            out.close();
+            replaceBadXML(timeStamp);
+        } catch (TransformerException | FileNotFoundException e) {
+            throw new BadXMLException();
+        }
+    }
+
+    private void handleCharacters(String name, XMLEvent event, Map<String, String> attMap) {
+        Characters characters = event.asCharacters();
+        attMap.put(name, characters.getData());
+    }
+
+    private void setPositionalFromXML(Map<String, String> attMap, Map<Integer, Argument> posMap) {
+        Argument arg = new Argument(attMap.get("name"));
+        arg.setType(attMap.get("type"));
+        posMap.put(Integer.parseInt(attMap.get("position")), arg);
+    }
+
+    private void setNamedFromXML(Map<String, String> attMap) {
+        NamedArgument arg = new NamedArgument("--" + attMap.get("name"), attMap.get("default"));
+        arg.setType(attMap.get("type"));
+        if (!attMap.get("shortname").equals("")) {
+            this.setNickname(arg, "-" + attMap.get("shortname"));
+        } else {
+            this.setArgument(arg);
+        }
+    }
+    //endregion
 }
