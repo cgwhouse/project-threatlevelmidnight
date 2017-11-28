@@ -5,7 +5,12 @@ package edu.wofford;
  * <p>
  * Argument objects have a name, a value, a description, and a type.
  * <p>
- * TODO: Include Examples Demonstrating the Above
+ * Example:
+ * <code>Argument arg = new Argument("color");</code>
+ * <code>parser.setArgument(arg);</code>
+ * <p>
+ * In the example, we create an Argument object for an argument called "color".
+ * We then can pass our Argument into our ArgumentParser.
  */
 public class Argument {
 

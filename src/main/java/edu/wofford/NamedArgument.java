@@ -5,7 +5,12 @@ package edu.wofford;
  * <p>
  * NamedArgument objects are Arguments with nicknames.
  * <p>
- * TODO: Include Examples Demonstrating the Above
+ * Example:
+ * <code>NamedArgument arg = new NamedArgument("--type", "ellipsoid");</code>
+ * <code>parser.setArgument(arg);</code>
+ * <p>
+ * In the example, we create a NamedArgument object for an argument called "--type" with the default value of "ellipsoide".
+ * We then can pass our NamedArgument into our ArgumentParser.
  */
 public class NamedArgument extends Argument {
     private String nicknames;
