@@ -369,18 +369,84 @@ public class ArgumentParserTest {
     }
 
     @Test
-    public void testAcceptedValuesOnly() {
-        try {
-        String[] argumentValues = { "7", "5", "-t", "vape", "2" };
+    public void TestAcceptedValuesSet() {
+        String[] argumentValues = { "7", "5", "-t", "ellipsoid", "2" };
         parser.setArguments(argumentNames);
-
         NamedArgument typeArg = new NamedArgument("--type", "box");
-        String[] accepted = {"box", "ellipsoid", "pyramid"};
-        typeArg.setAcceptedValues(accepted);
+        String[] accepted = { "box", "ellipsoid", "pyramid" };
+        typeArg.addAcceptedValues(accepted);
+        parser.setNickname(typeArg, "-t");
         parser.setArgumentValues(argumentValues);
+        assertEquals("ellipsoid", parser.getValue("--type"));
+    }
+
+    @Test
+    public void testAcceptedValuesError() {
+        try {
+            String[] argumentValues = { "7", "5", "-t", "vape", "2" };
+            parser.setArguments(argumentNames);
+            NamedArgument typeArg = new NamedArgument("--type", "box");
+            String[] accepted = { "box", "ellipsoid", "pyramid" };
+            typeArg.addAcceptedValues(accepted);
+            parser.setNickname(typeArg, "-t");
+            parser.setArgumentValues(argumentValues);
         } catch (UnacceptedValueException e) {
-            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: argument --type: invalid string value: vape";
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: argument --type: unaccepted value: vape";
             assertEquals(message, e.getMessage());
         }
+    }
+
+    @Test
+    public void testXMLAcceptedValuesOnly() {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("testXMLParser.xml").getFile());
+        String[] argumentValues = { "7", "5", "-t", "ellipsoid", "2", "-d", "5" };
+        parser.parseXML(file.getAbsolutePath());
+        parser.setArgumentValues(argumentValues);
+        assertEquals("7", parser.getValue("length"));
+        assertEquals("float", parser.getType("width"));
+        assertEquals("ellipsoid", parser.getValue("--type"));
+        assertEquals("5", parser.getValue("-d"));
+    }
+
+    @Test
+    public void testXMLAcceptedValuesError() {
+        try {
+            ClassLoader classLoader = getClass().getClassLoader();
+            File file = new File(classLoader.getResource("testXMLParser.xml").getFile());
+            String[] argumentValues = { "7", "5", "-t", "ellipsoid", "2", "-d", "6" };
+            parser.parseXML(file.getAbsolutePath());
+            parser.setArgumentValues(argumentValues);
+        } catch (UnacceptedValueException e) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: argument --digits: unaccepted value: 6";
+            assertEquals(message, e.getMessage());
+        }
+    }
+
+    @Test
+    public void testXMLCreatorAcceptedValues() {
+        String expected = "<arguments>";
+        expected += "<positional><name>length</name><type>float</type><position>1</position></positional>";
+        expected += "<positional><name>width</name><type>float</type><position>2</position></positional>";
+        expected += "<positional><name>height</name><type>float</type><position>3</position></positional>";
+        expected += "<named><name>type</name><shortname>t</shortname><type>string</type><default>box</default>";
+        expected += "<accepted>pyramid</accepted><accepted>box</accepted><accepted>ellipsoid</accepted></named>";
+        expected += "<named><name>digits</name><type>integer</type><default>4</default></named>";
+        expected += "</arguments>";
+        for (int i = 0; i < argumentNames.length; i++) {
+            Argument arg = new Argument(argumentNames[i]);
+            arg.setType("float");
+            parser.setArgument(arg);
+        }
+        NamedArgument typeArg = new NamedArgument("--type", "box");
+        typeArg.setType("string");
+        String[] accepted = { "box", "ellipsoid", "pyramid" };
+        typeArg.addAcceptedValues(accepted);
+        parser.setNickname(typeArg, "-t");
+        NamedArgument digitsArg = new NamedArgument("--digits", "4");
+        digitsArg.setType("integer");
+        parser.setArgument(digitsArg);
+        String result = parser.createXML(false);
+        assertEquals(expected, result);
     }
 }

@@ -19,11 +19,16 @@
 		<shortname>t</shortname>
 		<type>string</type>
 		<default>box</default>
+		<accepted>box</accepted>
+		<accepted>pyramid</accepted>
+		<accepted>ellipsoid</accepted>
 	</named>
 	<named>
 		<name>digits</name>
 		<shortname>d</shortname>
 		<type>integer</type>
 		<default>4</default>
+		<accepted>4</accepted>
+		<accepted>5</accepted>
 	</named>
 </arguments>
