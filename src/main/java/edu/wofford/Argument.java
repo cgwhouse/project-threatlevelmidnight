@@ -7,16 +7,15 @@ import java.util.Set;
  * Argument is a structure used by ArgumentParser.
  * <p>
  * Argument objects have a name, a value, a description, and a type.
- * <p>
- * Example:
  * <pre>
+ * Example:
  * {@code
  * Argument arg = new Argument("color");
  * parser.setArgument(arg);
  * }
- * </pre>
  * In the example, we create an Argument object for an argument called "color".
  * We then can pass our Argument into our ArgumentParser.
+ * </pre>
  */
 public class Argument {
 
