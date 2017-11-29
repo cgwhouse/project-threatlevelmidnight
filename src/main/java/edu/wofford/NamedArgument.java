@@ -16,6 +16,7 @@ package edu.wofford;
  */
 public class NamedArgument extends Argument {
     private String nicknames;
+    private Boolean required;
 
     /** 
      * Constructs an Argument object which requires the Argument name as a string and sets the value of the Argument.
@@ -27,6 +28,21 @@ public class NamedArgument extends Argument {
         super(name);
         this.setValue(value);
         nicknames = "-";
+        required = false;
+    }
+
+    /** 
+     * Constructs an Argument object which requires the Argument name as a string, required as a boolean and sets the value of the Argument.
+     * 
+     * @param name the name of the Argument
+     * @param value the value of the Argument
+     * @param required denotes whether the Argument is required
+     */
+    public NamedArgument(String name) {
+        super(name);
+        this.setValue("");
+        nicknames = "-";
+        required = true;
     }
 
     /** 
@@ -45,5 +61,14 @@ public class NamedArgument extends Argument {
      */
     public String getNicknames() {
         return nicknames;
+    }
+
+    /** 
+     * Gets whether the Argument is required or not.
+     * 
+     * @return either true or false
+     */
+    public Boolean isRequired() {
+        return required;
     }
 }

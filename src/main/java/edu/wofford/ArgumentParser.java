@@ -343,6 +343,15 @@ public class ArgumentParser {
                     + positionalArgs.get(positionalIndex);
             throw new MissingRequiredArgumentException(msg);
         }
+        
+        for (String name : namedArgs) {
+            NamedArgument arg = (NamedArgument)argumentMap.get(name);
+
+            if (arg.isRequired() && arg.getValue().equals("")) {
+                msg += programName + ".java: error: the following arguments are required: " + name;
+                throw new MissingRequiredArgumentException(msg);
+            }
+        }
     }
 
     /**
