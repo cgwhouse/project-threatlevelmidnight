@@ -64,12 +64,25 @@ public class Argument {
     }
 
     /**
-     * Sets the values that an Argument can be set to. If no values are set, then the argument accepts all 
+     * Sets the values that the Argument can be set to. If no values are set, then the argument accepts all 
      * values that are valid for its type.
      * 
      * @param values string array of values that the Argument can be set to
      */
-    public void setAcceptedValues(String[] values) {
+    public void addAcceptedValues(String[] values) {
+        for (int i = 0; i < values.length; i++) {
+            accepted.add(values[i]);
+        }
+    }
+
+    /**
+     * Adds a value to the set of accepted values that the Argument can be. If no values are set, then the
+     * argument accepts all values that are valid for its type.
+     * 
+     * @param value string representation of the value that the Argument can be set to
+     */
+    public void addAcceptedValue(String value) {
+        accepted.add(value);
     }
 
     /** 
@@ -106,5 +119,14 @@ public class Argument {
      */
     public String getType() {
         return type;
+    }
+
+    /**
+     * Gets the Argument's accepted values.
+     * 
+     * @return set of of the accepted values for the Argument, as strings
+     */
+    public Set<String> getAcceptedValues() {
+        return accepted;
     }
 }

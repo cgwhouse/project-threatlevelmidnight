@@ -352,11 +352,13 @@ public class ArgumentParser {
      */
     public void parseXML(String filename) {
         int positionalCount = 0;
-        String[] fields = { "name", "shortname", "type", "position", "default" };
+        String[] fields = { "name", "shortname", "type", "position", "default", "accepted" };
         Set<String> set = new HashSet<String>(Arrays.asList(fields));
+        Set<String> accepted = new HashSet<String>();
         Map<Integer, Argument> posMap = new HashMap<Integer, Argument>();
         Map<String, String> attMap = new HashMap<String, String>();
-        for (int i = 0; i < fields.length; i++) {
+
+        for (int i = 0; i < fields.length - 1; i++) {
             attMap.put(fields[i], "");
         }
         try {
@@ -368,8 +370,11 @@ public class ArgumentParser {
                 case XMLStreamConstants.START_ELEMENT:
                     StartElement startElement = event.asStartElement();
                     String qName = startElement.getName().getLocalPart().toLowerCase();
+                    if (qName.equals("positional") || qName.equals("named")) {
+                        accepted.clear();
+                    }
                     if (set.contains(qName)) {
-                        handleCharacters(qName, eventReader.nextEvent(), attMap);
+                        handleCharacters(qName, eventReader.nextEvent(), attMap, accepted);
                     }
                     break;
                 case XMLStreamConstants.END_ELEMENT:
@@ -378,9 +383,9 @@ public class ArgumentParser {
                             || endElement.getName().getLocalPart().equalsIgnoreCase("named")) {
                         if (endElement.getName().getLocalPart().equalsIgnoreCase("positional")) {
                             positionalCount++;
-                            setPositionalFromXML(attMap, posMap);
+                            setPositionalFromXML(attMap, posMap, accepted);
                         } else if (endElement.getName().getLocalPart().equalsIgnoreCase("named")) {
-                            setNamedFromXML(attMap);
+                            setNamedFromXML(attMap, accepted);
                         }
                     }
                     break;
@@ -390,7 +395,9 @@ public class ArgumentParser {
                 Argument arg = posMap.get(i);
                 this.setArgument(arg);
             }
-        } catch (FileNotFoundException | XMLStreamException e) {
+        } catch (FileNotFoundException |
+
+                XMLStreamException e) {
             throw new BadXMLException();
         }
     }
@@ -456,8 +463,15 @@ public class ArgumentParser {
         return "usage: java " + programName + " " + makeString(positionalArgs) + "\n";
     }
 
-    //TODO add the restricted value checking to this method
     private void checkAndSet(Argument current, String value) {
+        Set<String> accepted = current.getAcceptedValues();
+        if (!accepted.isEmpty()) {
+            if (!accepted.contains(value)) {
+                String msg = makeUsageMessage();
+                msg += programName + ".java: error: argument " + current.getName() + ": unaccepted value: " + value;
+                throw new UnacceptedValueException(msg);
+            }
+        }
         if (legitimateValue(current.getType(), value)) {
             current.setValue(value);
         } else {
@@ -526,6 +540,13 @@ public class ArgumentParser {
             writer.writeStartElement("position");
             writer.writeCharacters(Integer.toString(position));
             writer.writeEndElement();
+            if (!arg.getAcceptedValues().isEmpty()) {
+                for (String value : arg.getAcceptedValues()) {
+                    writer.writeStartElement("accepted");
+                    writer.writeCharacters(value);
+                    writer.writeEndElement();
+                }
+            }
             writer.writeEndElement();
         } catch (XMLStreamException e) {
             throw new BadXMLException();
@@ -552,6 +573,13 @@ public class ArgumentParser {
             writer.writeStartElement("default");
             writer.writeCharacters(arg.getValue());
             writer.writeEndElement();
+            if (!arg.getAcceptedValues().isEmpty()) {
+                for (String value : arg.getAcceptedValues()) {
+                    writer.writeStartElement("accepted");
+                    writer.writeCharacters(value);
+                    writer.writeEndElement();
+                }
+            }
             writer.writeEndElement();
         } catch (XMLStreamException e) {
             throw new BadXMLException();
@@ -576,25 +604,34 @@ public class ArgumentParser {
         }
     }
 
-    private void handleCharacters(String name, XMLEvent event, Map<String, String> attMap) {
+    private void handleCharacters(String name, XMLEvent event, Map<String, String> attMap, Set<String> acc) {
         Characters characters = event.asCharacters();
-        attMap.put(name, characters.getData());
+        if (name.equals("accepted")) {
+            acc.add(characters.getData());
+        } else {
+            attMap.put(name, characters.getData());
+        }
     }
 
-    private void setPositionalFromXML(Map<String, String> attMap, Map<Integer, Argument> posMap) {
+    private void setPositionalFromXML(Map<String, String> attMap, Map<Integer, Argument> posMap, Set<String> acc) {
         Argument arg = new Argument(attMap.get("name"));
         arg.setType(attMap.get("type"));
+        String[] array = acc.toArray(new String[acc.size()]);
+        arg.addAcceptedValues(array);
         posMap.put(Integer.parseInt(attMap.get("position")), arg);
     }
 
-    private void setNamedFromXML(Map<String, String> attMap) {
+    private void setNamedFromXML(Map<String, String> attMap, Set<String> acc) {
         NamedArgument arg = new NamedArgument("--" + attMap.get("name"), attMap.get("default"));
         arg.setType(attMap.get("type"));
+        String[] array = acc.toArray(new String[acc.size()]);
+        arg.addAcceptedValues(array);
         if (!attMap.get("shortname").equals("")) {
             this.setNickname(arg, "-" + attMap.get("shortname"));
         } else {
             this.setArgument(arg);
         }
     }
+
     //endregion
 }
