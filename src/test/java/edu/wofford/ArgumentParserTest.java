@@ -471,4 +471,33 @@ public class ArgumentParserTest {
         String result = parser.createXML(false);
         assertEquals(expected, result);
     }
+
+    @Test
+    public void testRequiredNamedArgument() {
+        String[] values = { "7", "5", "2" };
+        for (int i = 0; i < argumentNames.length; i++) {
+            Argument arg = new Argument(argumentNames[i]);
+            arg.setType("float");
+            parser.setArgument(arg);
+        }
+        NamedArgument testArg = new NamedArgument("--test");
+        testArg.setType("string");
+        parser.setArgument(testArg);
+        String expected = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are required: --test";
+        try {
+            parser.setArgumentValues(values);
+        } catch (MissingRequiredArgumentException e) {
+            assertEquals(expected, e.getMessage());
+        }
+    }
+
+    @Test
+    public void testRequiredNamedArgsRetrieve() {
+        String[] argumentValues = { "7", "5", "2", "--type", "square" };
+        NamedArgument arg = new NamedArgument("--type");
+        parser.setArguments(argumentNames);
+        parser.setArgument(arg);
+        parser.setArgumentValues(argumentValues);
+        assertEquals("square", parser.getValue("--type"));
+    }
 }
