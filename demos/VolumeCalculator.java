@@ -16,6 +16,8 @@ public class VolumeCalculator {
 
         NamedArgument typeArg = new NamedArgument("--type", "box");
         typeArg.setType("string");
+        String[] accepted = { "box", "ellipsoid", "pyramid" };
+        typeArg.addAcceptedValues(accepted);
         parser.setNickname(typeArg, "-t");
         NamedArgument digitsArg = new NamedArgument("--digits", "4");
         digitsArg.setType("integer");
@@ -31,6 +33,7 @@ public class VolumeCalculator {
                 helpMessage += "The type of length is float.\n";
                 helpMessage += "The value of --type is ellipsoid (default is box).\n";
                 helpMessage += "The short form of --type is -t.\n";
+                helpMessage += "Possible values for --type are: box, pyramid, ellipsoid\n";
                 helpMessage += "-a adds 50 to the result and -s subtracts 75.\n";
                 helpMessage += "-x creates a file containing the argument information in xml format.\n";
                 System.out.println(helpMessage);
