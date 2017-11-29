@@ -9,9 +9,12 @@ import java.util.Set;
  * Argument objects have a name, a value, a description, and a type.
  * <p>
  * Example:
- * <code>Argument arg = new Argument("color");</code>
- * <code>parser.setArgument(arg);</code>
- * <p>
+ * <pre>
+ * {@code
+ * Argument arg = new Argument("color");
+ * parser.setArgument(arg);
+ * }
+ * </pre>
  * In the example, we create an Argument object for an argument called "color".
  * We then can pass our Argument into our ArgumentParser.
  */

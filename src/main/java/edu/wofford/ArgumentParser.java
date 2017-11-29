@@ -15,27 +15,33 @@ import java.text.SimpleDateFormat;
  * Required arguments and named arguments can be of type string, integer, float, or boolean.
  * <p>
  * Example 1:
- * <code>private ArgumentParser parser;</code>
- * <code>parser = new ArgumentParser("Example 1 Program");</code>
- * <code>String[] argumentNames = { "requiredArg1", "requiredArg2", "requiredArg3" };</code>
- * <code>parser.setArguments(argumentNames);</code>
- * <code>parser.setArgumentValues(args);
- * <p>
+ * <pre>
+ * {@code
+ * private ArgumentParser parser;
+ * parser = new ArgumentParser("Example 1 Program");
+ * String[] argumentNames = { "requiredArg1", "requiredArg2", "requiredArg3" };
+ * parser.setArguments(argumentNames);
+ * parser.setArgumentValues(args);
+ * }
+ * </pre>
  * In Example 1, we create an ArgumentParser for our program, "Example 1 Program".
  * We then specify the name of the arguments our program requires: "requiredArg1", "requiredArg2", "requriedArg3".
  * We then pass in the argument values from the user.
  * The user's values come via the execution of your program from the command line (args).
  * <p>
  * Example 2:
- * <code>private ArgumentParser parser;</code>
- * <code>parser = new ArgumentParser("Example 2 Program");</code>
- * <code>String[] argumentNames = { "requiredArg1", "requiredArg2", "requiredArg3" };</code>
- * <code>Argument arg = new Argument(argumentNames[0]);</code>
- * <code>parser.setArgument(arg);</code>
- * <code>parser.setArgument(argumentNames[1]);</code>
- * <code>parser.setArgument(argumentNames[2]);</code>
- * <code>parser.setArgumentValues(args);
- * <p>
+ * <pre>
+ * {@code
+ * private ArgumentParser parser;
+ * parser = new ArgumentParser("Example 2 Program");
+ * String[] argumentNames = { "requiredArg1", "requiredArg2", "requiredArg3" };
+ * Argument arg = new Argument(argumentNames[0]);
+ * parser.setArgument(arg);
+ * parser.setArgument(argumentNames[1]);
+ * parser.setArgument(argumentNames[2]);
+ * parser.setArgumentValues(args);
+ * }
+ * </pre>
  * In Example 2, we create an ArgumentParser for our program, "Example 2 Program".
  * We then specify the name of the arguments our program requires in two ways.
  * The first way is using an Argument object; we set one of the required arguments by creating an Argument object and passing it to setArgument.
@@ -44,14 +50,17 @@ import java.text.SimpleDateFormat;
  * The user's values come via the execution of your program from the command line (args).
  * <p>
  * Example 3:
- * <code>private ArgumentParser parser;</code>
- * <code>parser = new ArgumentParser("Example 3 Program");</code>
- * <code>String[] argumentNames = { "requiredArg1", "requiredArg2", "requiredArg3" };</code>
- * <code>NamedArgument arg = new NamedArgument("--type", "ellipsoid");</code>
- * <code>parser.setArguments(argumentNames);</code>
- * <code>parser.setArgument(arg);</code>
- * <code>parser.setArgumentValues(args);
- * <p>
+ * <pre>
+ * {@code
+ * private ArgumentParser parser;
+ * parser = new ArgumentParser("Example 3 Program");
+ * String[] argumentNames = { "requiredArg1", "requiredArg2", "requiredArg3" };
+ * NamedArgument arg = new NamedArgument("--type", "ellipsoid");
+ * parser.setArguments(argumentNames);
+ * parser.setArgument(arg);
+ * parser.setArgumentValues(args);
+ * }
+ * </pre>
  * In Example 3, we create an ArgumentParser for our program, "Example 3 Program".
  * We then specify the name of the arguments our program requires by using setArguments.
  * We then pass in the NamedArgument object, "--type" with the default value of "ellipsoid".
