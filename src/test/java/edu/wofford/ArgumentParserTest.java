@@ -449,4 +449,26 @@ public class ArgumentParserTest {
         String result = parser.createXML(false);
         assertEquals(expected, result);
     }
+
+    @Test
+    public void testXMLCreatorPositionalAcceptedValues() {
+        String expected = "<arguments>";
+        expected += "<positional><name>length</name><type>float</type><position>1</position></positional>";
+        expected += "<positional><name>width</name><type>float</type><position>2</position></positional>";
+        expected += "<positional><name>height</name><type>float</type><position>3</position></positional>";
+        expected += "<positional><name>test</name><type>string</type><position>4</position>";
+        expected += "<accepted>valid</accepted></positional>";
+        expected += "</arguments>";
+        for (int i = 0; i < argumentNames.length; i++) {
+            Argument arg = new Argument(argumentNames[i]);
+            arg.setType("float");
+            parser.setArgument(arg);
+        }
+        Argument testArg = new Argument("test");
+        testArg.setType("string");
+        testArg.addAcceptedValue("valid");
+        parser.setArgument(testArg);
+        String result = parser.createXML(false);
+        assertEquals(expected, result);
+    }
 }
