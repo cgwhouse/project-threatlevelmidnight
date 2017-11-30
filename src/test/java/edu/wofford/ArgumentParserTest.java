@@ -1,6 +1,8 @@
 package edu.wofford;
 
 import java.io.File;
+import java.net.PasswordAuthentication;
+
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -415,6 +417,7 @@ public class ArgumentParserTest {
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("testXMLParser.xml").getFile());
             String[] argumentValues = { "7", "5", "-t", "ellipsoid", "2", "-d", "6" };
+            System.out.println(file.getAbsolutePath());
             parser.parseXML(file.getAbsolutePath());
             parser.setArgumentValues(argumentValues);
         } catch (UnacceptedValueException e) {
@@ -473,31 +476,52 @@ public class ArgumentParserTest {
     }
 
     @Test
-    public void testRequiredNamedArgument() {
-        String[] values = { "7", "5", "2" };
-        for (int i = 0; i < argumentNames.length; i++) {
-            Argument arg = new Argument(argumentNames[i]);
-            arg.setType("float");
-            parser.setArgument(arg);
-        }
-        NamedArgument testArg = new NamedArgument("--test");
-        testArg.setType("string");
-        parser.setArgument(testArg);
-        String expected = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are required: --test";
+    public void testRequiredNamedArgsRetrieve() {
+        String[] argumentValues = { "7", "5", "2", "--type", "square" };
+
+        NamedArgument arg = new NamedArgument("--type");
+
+        parser.setArguments(argumentNames);
+        parser.setArgument(arg);
+        parser.setArgumentValues(argumentValues);
+
+        assertEquals("square", parser.getValue("--type"));
+    }
+
+    @Test
+    public void testRequiredNamedArgsError() {
         try {
-            parser.setArgumentValues(values);
-        } catch (MissingRequiredArgumentException e) {
-            assertEquals(expected, e.getMessage());
+            String[] argumentValues = { "7", "5", "2", "--type", "square" };
+    
+            NamedArgument arg1 = new NamedArgument("--type");
+            NamedArgument arg2 = new NamedArgument("--color");
+    
+            parser.setArguments(argumentNames);
+            parser.setArgument(arg1);
+            parser.setArgument(arg2);
+            parser.setArgumentValues(argumentValues);
+        } catch (ArgumentException error) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are required: --color";
+            assertEquals(message, error.getMessage());
         }
     }
 
     @Test
-    public void testRequiredNamedArgsRetrieve() {
-        String[] argumentValues = { "7", "5", "2", "--type", "square" };
-        NamedArgument arg = new NamedArgument("--type");
-        parser.setArguments(argumentNames);
-        parser.setArgument(arg);
-        parser.setArgumentValues(argumentValues);
-        assertEquals("square", parser.getValue("--type"));
+    public void testMutuallyExclusiveRequiredNamedArgsError() {
+        try {
+            String[] argumentValues = { "7", "5", "2", "--type", "square", "--shape", "circle" };
+
+            NamedArgument arg1 = new NamedArgument("--type", "circle");
+            NamedArgument arg2 = new NamedArgument("--shape", "circle");
+            arg1.addMutuallyExclusiveArg(arg2);
+            arg2.addMutuallyExclusiveArg(arg1);
+            parser.setArguments(argumentNames);
+            parser.setArgument(arg1);
+            parser.setArgument(arg2);
+            parser.setArgumentValues(argumentValues);
+        } catch (ArgumentException error) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are mutually exclusive: --shape and --type";
+            assertEquals(message, error.getMessage());
+        }
     }
 }

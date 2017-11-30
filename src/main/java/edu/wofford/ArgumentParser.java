@@ -344,12 +344,28 @@ public class ArgumentParser {
             throw new MissingRequiredArgumentException(msg);
         }
         
+        String mutuallyExclusiveNamedArg = "";
+
         for (String name : namedArgs) {
             NamedArgument arg = (NamedArgument)argumentMap.get(name);
 
             if (arg.isRequired() && arg.getValue().equals("")) {
                 msg += programName + ".java: error: the following arguments are required: " + name;
                 throw new MissingRequiredArgumentException(msg);
+            }
+
+            if (arg.hasMutualExclusiveArgs()) {
+                if (mutuallyExclusiveNamedArg.equals("")) {
+                    mutuallyExclusiveNamedArg = arg.getName();
+                }
+                else {
+                    NamedArgument mutuallyExclusiveArg = (NamedArgument)argumentMap.get(mutuallyExclusiveNamedArg);
+
+                    if (arg.isMutuallyExclusive(mutuallyExclusiveNamedArg) || mutuallyExclusiveArg.isMutuallyExclusive(arg)) {
+                        msg += programName + ".java: error: the following arguments are mutually exclusive: " + name + " and " + mutuallyExclusiveNamedArg;
+                        throw new MissingRequiredArgumentException(msg);
+                    }
+                }
             }
         }
     }

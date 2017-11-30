@@ -1,5 +1,7 @@
 package edu.wofford;
 
+import java.util.*;
+
 /**
  * NamedArgument is a structure used by ArgumentParser that extends Argument.
  * <p>
@@ -17,6 +19,7 @@ package edu.wofford;
 public class NamedArgument extends Argument {
     private String nicknames;
     private Boolean required;
+    private List<String> mutuallyExclusiveNamedArgs;
 
     /** 
      * Constructs an Argument object which requires the Argument name as a string and sets the value of the Argument.
@@ -29,6 +32,7 @@ public class NamedArgument extends Argument {
         this.setValue(value);
         nicknames = "-";
         required = false;
+        mutuallyExclusiveNamedArgs = new ArrayList<String>();
     }
 
     /** 
@@ -43,6 +47,7 @@ public class NamedArgument extends Argument {
         this.setValue("");
         nicknames = "-";
         required = true;
+        mutuallyExclusiveNamedArgs = new ArrayList<String>();
     }
 
     /** 
@@ -52,6 +57,28 @@ public class NamedArgument extends Argument {
      */
     public void addNickname(String nickname) {
         nicknames += nickname;
+    }
+
+    /** 
+     * Adds the name of the Argument to the list that holds mutually exclusive Argument names.
+     * 
+     * @param argName the name of the Argument as a string
+     */
+    public void addMutuallyExclusiveArg(String argName) {
+        if (!mutuallyExclusiveNamedArgs.contains(argName)) {
+            mutuallyExclusiveNamedArgs.add(argName);
+        }
+    }
+
+    /** 
+     * Adds the name of the Argument to the list that holds mutually exclusive Argument names.
+     * 
+     * @param arg the NamedArgument
+     */
+    public void addMutuallyExclusiveArg(NamedArgument arg) {
+        if (!mutuallyExclusiveNamedArgs.contains(arg.getName())) {
+            mutuallyExclusiveNamedArgs.add(arg.getName());
+        }
     }
 
     /** 
@@ -70,5 +97,47 @@ public class NamedArgument extends Argument {
      */
     public Boolean isRequired() {
         return required;
+    }
+
+    /** 
+     * Gets whether the NamedArgument is mutually exclusive or not.
+     * 
+     * @return either true or false
+     */
+    public Boolean hasMutualExclusiveArgs() {
+        if (mutuallyExclusiveNamedArgs.size() > 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    /** 
+     * Gets whether the NamedArgument is mutually exclusive or not to the provided NamedArgument.
+     * 
+     * @return either true or false
+     */
+    public Boolean isMutuallyExclusive(NamedArgument arg) {
+        if (mutuallyExclusiveNamedArgs.contains(arg.getName())) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    /** 
+     * Gets whether the NamedArgument is mutually exclusive or not to the provided NamedArgument name as a string.
+     * 
+     * @return either true or false
+     */
+    public Boolean isMutuallyExclusive(String argName) {
+        if (mutuallyExclusiveNamedArgs.contains(argName)) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }
