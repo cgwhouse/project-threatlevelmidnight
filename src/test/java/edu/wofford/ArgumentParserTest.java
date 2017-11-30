@@ -528,7 +528,7 @@ public class ArgumentParserTest {
     @Test
     public void testDifferentSetsOfMutuallyExclusiveRequiredNamedArgsError() {
         try {
-            String[] argumentValues = { "7", "5", "2", "--color", "blue", "--shape", "circle", "--hue", "red" };
+            String[] argumentValues = { "7", "5", "2", "--color", "blue", "--shape", "circle", "--hue", "red", "--test1", "1" };
 
             NamedArgument arg1 = new NamedArgument("--type", "oval");
             NamedArgument arg2 = new NamedArgument("--shape", "circle");
@@ -540,11 +540,18 @@ public class ArgumentParserTest {
             arg3.addMutuallyExclusiveArg(arg3);
             arg4.addMutuallyExclusiveArg(arg4);
 
+            NamedArgument arg5 = new NamedArgument("--test1", "1");
+            NamedArgument arg6 = new NamedArgument("--test2", "2");
+            arg3.addMutuallyExclusiveArg(arg5);
+            arg4.addMutuallyExclusiveArg(arg6);
+
             parser.setArguments(argumentNames);
             parser.setArgument(arg1);
             parser.setArgument(arg2);
             parser.setArgument(arg3);
             parser.setArgument(arg4);
+            parser.setArgument(arg5);
+            parser.setArgument(arg6);
             parser.setArgumentValues(argumentValues);
         } catch (ArgumentException error) {
             String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are mutually exclusive: --hue and --color";

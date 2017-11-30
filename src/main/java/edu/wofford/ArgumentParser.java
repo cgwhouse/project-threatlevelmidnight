@@ -298,7 +298,10 @@ public class ArgumentParser {
                         checkAndSet(current, value);
                     }
                     if (namedArgs.contains(current.getName())) {
-                        encounteredMutuallyExclusiveNamedArgs.add(current.getName());
+                        NamedArgument currentNamedArgument = (NamedArgument)current;
+                        if (currentNamedArgument.hasMutualExclusiveArgs()){
+                            encounteredMutuallyExclusiveNamedArgs.add(currentNamedArgument.getName());
+                        }
                     }
                 }
             } else if (arg.startsWith("-") && !arg.startsWith("--")) {
