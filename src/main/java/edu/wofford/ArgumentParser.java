@@ -363,7 +363,7 @@ public class ArgumentParser {
 
                     if (arg.isMutuallyExclusive(mutuallyExclusiveNamedArg) || mutuallyExclusiveArg.isMutuallyExclusive(arg)) {
                         msg += programName + ".java: error: the following arguments are mutually exclusive: " + name + " and " + mutuallyExclusiveNamedArg;
-                        throw new MissingRequiredArgumentException(msg);
+                        throw new MutuallyExclusiveArgumentException(msg);
                     }
                 }
             }
