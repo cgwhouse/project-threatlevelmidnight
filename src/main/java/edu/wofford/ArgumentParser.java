@@ -277,6 +277,7 @@ public class ArgumentParser {
      * @throws HelpException                    if the value "-h" or "--help" is provided
      */
     public void setArgumentValues(String[] values) {
+        List<String> encounteredMutuallyExclusiveNamedArgs = new ArrayList<String>();
         Queue<String> queue = new ArrayDeque<>();
         for (String s : values) {
             queue.add(s);
@@ -295,6 +296,9 @@ public class ArgumentParser {
                     } else {
                         String value = queue.remove();
                         checkAndSet(current, value);
+                    }
+                    if (namedArgs.contains(current.getName())) {
+                        encounteredMutuallyExclusiveNamedArgs.add(current.getName());
                     }
                 }
             } else if (arg.startsWith("-") && !arg.startsWith("--")) {
@@ -344,9 +348,9 @@ public class ArgumentParser {
             throw new MissingRequiredArgumentException(msg);
         }
         
-        String mutuallyExclusiveNamedArg = "";
+        List<String> mutuallyExclusiveNamedArgs = new ArrayList<String>();
 
-        for (String name : namedArgs) {
+        for (String name : encounteredMutuallyExclusiveNamedArgs) {
             NamedArgument arg = (NamedArgument)argumentMap.get(name);
 
             if (arg.isRequired() && arg.getValue().equals("")) {
@@ -355,14 +359,13 @@ public class ArgumentParser {
             }
 
             if (arg.hasMutualExclusiveArgs()) {
-                if (mutuallyExclusiveNamedArg.equals("")) {
-                    mutuallyExclusiveNamedArg = arg.getName();
+                if (mutuallyExclusiveNamedArgs.size() == 0) {
+                    mutuallyExclusiveNamedArgs.add(arg.getName());
                 }
                 else {
-                    NamedArgument mutuallyExclusiveArg = (NamedArgument)argumentMap.get(mutuallyExclusiveNamedArg);
-
-                    if (arg.isMutuallyExclusive(mutuallyExclusiveNamedArg) || mutuallyExclusiveArg.isMutuallyExclusive(arg)) {
-                        msg += programName + ".java: error: the following arguments are mutually exclusive: " + name + " and " + mutuallyExclusiveNamedArg;
+                    String mutuallyExclusiveArgConflict = checkMutuallyExclusiveNamedArgs(mutuallyExclusiveNamedArgs, arg);
+                    if (!mutuallyExclusiveArgConflict.equals("")) {
+                        msg += programName + ".java: error: the following arguments are mutually exclusive: " + name + " and " + mutuallyExclusiveArgConflict;
                         throw new MutuallyExclusiveArgumentException(msg);
                     }
                 }
@@ -448,6 +451,20 @@ public class ArgumentParser {
             return false;
         }
         return true;
+    }
+
+    private String checkMutuallyExclusiveNamedArgs(List<String> mutuallyExclusiveArgs, NamedArgument mutuallyExclusiveArg) {
+        String retVal = "";
+
+        for (String argName : mutuallyExclusiveArgs) {
+            NamedArgument arg = (NamedArgument)argumentMap.get(argName);
+
+            if (mutuallyExclusiveArg.isMutuallyExclusive(argName) || arg.isMutuallyExclusive(mutuallyExclusiveArg.getName())){
+                return argName;
+            }
+        }
+
+        return retVal;
     }
     //endregion
 
