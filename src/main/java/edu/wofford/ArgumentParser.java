@@ -267,7 +267,7 @@ public class ArgumentParser {
 
     /**
      * Parses the values taken from the command line and sets them to their respective arguments. If the
-     * value "-h" or "--help" is detected, a help message will display to the user.
+     * value "-h" or "--help" is detected, a help message will be displayed to the user.
      * 
      * @param values                            string of values from the command line
      * @throws UnrecognizedArgumentException    if an argument is provided that the ArgumentParser does not
