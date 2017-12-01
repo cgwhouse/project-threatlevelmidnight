@@ -184,6 +184,18 @@ public class XML {
             writer.writeStartElement("default");
             writer.writeCharacters(arg.getValue());
             writer.writeEndElement();
+            if (arg.hasMutualExclusiveArgs()) {
+                for (Map.Entry<String, Argument> pair : argumentMap.entrySet()) {
+                    if (pair.getKey().startsWith("--") && !pair.getKey().equals(arg.getName())){
+                        NamedArgument namedArg = (NamedArgument)pair.getValue();
+                        if (namedArg.hasMutualExclusiveArgs() && namedArg.isMutuallyExclusive(arg)) {
+                            writer.writeStartElement("mutex");
+                            writer.writeCharacters(arg.getType());
+                            writer.writeEndElement();
+                        }
+                    }
+                }
+            }
             if (!arg.getAcceptedValues().isEmpty()) {
                 for (String value : arg.getAcceptedValues()) {
                     writer.writeStartElement("accepted");
@@ -238,6 +250,9 @@ public class XML {
         arg.setType(attMap.get("type"));
         String[] array = acc.toArray(new String[acc.size()]);
         arg.addAcceptedValues(array);
+        if (!attMap.get("mutex").equals("")) {
+            arg.addMutuallyExclusiveArg(attMap.get("mutex"));
+        }
         if (!attMap.get("shortname").equals("")) {
             parser.setNickname(arg, "-" + attMap.get("shortname"));
         } else {
