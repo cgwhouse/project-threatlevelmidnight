@@ -2,7 +2,7 @@ package edu.wofford;
 
 import java.io.File;
 import java.net.PasswordAuthentication;
-
+import java.util.List;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -594,6 +594,39 @@ public class ArgumentParserTest {
             String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are mutually exclusive: --hue and --color";
             assertEquals(message, e.getMessage());
         }
+    }
 
+    @Test
+    public void testPositionalHasMultipleValues() {
+        String[] values = { "1", "2", "3", "5", "2" };
+        Argument length = new Argument("length");
+        length.setNumberOfValuesExpected(3);
+        length.setType("float");
+        parser.setArgument(length);
+        for (int i = 1; i < argumentNames.length; i++) {
+            Argument arg = new Argument(argumentNames[i]);
+            arg.setType("float");
+            parser.setArgument(arg);
+        }
+        parser.setArgumentValues(values);
+        List<String> lengthVals = parser.getValues("length");
+        for (int i = 0; i < 3; i++) {
+            assertEquals(lengthVals.get(i), values[i]);
+        }
+    }
+
+    @Test
+    public void testNotEnoughValuesForPositional() {
+        String[] values = { "4", "3", "2" };
+        Argument test = new Argument("test");
+        test.setType("float");
+        test.setNumberOfValuesExpected(4);
+        parser.setArgument(test);
+        try {
+            parser.setArgumentValues(values);
+        } catch (NotEnoughValuesException e) {
+            String message = "usage: java VolumeCalculator test\nVolumeCalculator.java: error: argument test requires 4 values";
+            assertEquals(message, e.getMessage());
+        }
     }
 }
