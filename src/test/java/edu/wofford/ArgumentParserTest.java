@@ -480,6 +480,7 @@ public class ArgumentParserTest {
         String[] argumentValues = { "7", "5", "2", "--type", "square" };
 
         NamedArgument arg = new NamedArgument("--type");
+        arg.setType("string");
 
         parser.setArguments(argumentNames);
         parser.setArgument(arg);
@@ -489,13 +490,28 @@ public class ArgumentParserTest {
     }
 
     @Test
+    public void testRequiredNamedArgsShortform() {
+        try {
+            String[] values = { "7", "5", "2" };
+            parser.setArguments(argumentNames);
+            NamedArgument typeArg = new NamedArgument("--type");
+            typeArg.setType("string");
+            parser.setNickname(typeArg, "-t");
+            parser.setArgumentValues(values);
+        } catch (MissingRequiredArgumentException e) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are required: --type";
+            assertEquals(message, e.getMessage());
+        }
+    }
+
+    @Test
     public void testRequiredNamedArgsError() {
         try {
             String[] argumentValues = { "7", "5", "2", "--type", "square" };
-    
+
             NamedArgument arg1 = new NamedArgument("--type");
             NamedArgument arg2 = new NamedArgument("--color");
-    
+
             parser.setArguments(argumentNames);
             parser.setArgument(arg1);
             parser.setArgument(arg2);
@@ -528,7 +544,8 @@ public class ArgumentParserTest {
     @Test
     public void testDifferentSetsOfMutuallyExclusiveRequiredNamedArgsError() {
         try {
-            String[] argumentValues = { "7", "5", "2", "--color", "blue", "--shape", "circle", "--hue", "red", "--test1", "1" };
+            String[] argumentValues = { "7", "5", "2", "--color", "blue", "--shape", "circle", "--hue", "red",
+                    "--test1", "1" };
 
             NamedArgument arg1 = new NamedArgument("--type", "oval");
             NamedArgument arg2 = new NamedArgument("--shape", "circle");
@@ -557,5 +574,26 @@ public class ArgumentParserTest {
             String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are mutually exclusive: --hue and --color";
             assertEquals(message, error.getMessage());
         }
+    }
+
+    @Test
+    public void testShortformMutuallyExclusiveError() {
+        try {
+            String[] values = { "7", "5", "2", "-c", "blue", "--hue", "green" };
+            parser.setArguments(argumentNames);
+            NamedArgument colorArg = new NamedArgument("--color", "red");
+            colorArg.setType("string");
+            NamedArgument hueArg = new NamedArgument("--hue", "red");
+            hueArg.setType("string");
+            colorArg.addMutuallyExclusiveArg(hueArg);
+            hueArg.addMutuallyExclusiveArg(colorArg);
+            parser.setNickname(colorArg, "-c");
+            parser.setArgument(hueArg);
+            parser.setArgumentValues(values);
+        } catch (MutuallyExclusiveArgumentException e) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are mutually exclusive: --hue and --color";
+            assertEquals(message, e.getMessage());
+        }
+
     }
 }

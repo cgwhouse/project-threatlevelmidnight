@@ -269,15 +269,17 @@ public class ArgumentParser {
      * Parses the values taken from the command line and sets them to their respective arguments. If the
      * value "-h" or "--help" is detected, a help message will be displayed to the user.
      * 
-     * @param values                            string of values from the command line
-     * @throws UnrecognizedArgumentException    if an argument is provided that the ArgumentParser does not
-     *                                          recognize
-     * @throws MissingRequiredArgumentException if a required argument's value is not provided
-     * @throws InvalidTypeException             if an argument's value does not match its expected type
-     * @throws HelpException                    if the value "-h" or "--help" is provided
+     * @param values                              string of values from the command line
+     * @throws UnrecognizedArgumentException      if an argument is provided that the ArgumentParser does not
+     *                                            recognize
+     * @throws MissingRequiredArgumentException   if a required argument's value is not provided
+     * @throws InvalidTypeException               if an argument's value does not match its expected type
+     * @throws HelpException                      if the value "-h" or "--help" is provided
+     * @throws MutuallyExclusiveArgumentException if two provided arguments must not be provided at the same
+     *                                            time
      */
     public void setArgumentValues(String[] values) {
-        List<String> encounteredMutuallyExclusiveNamedArgs = new ArrayList<String>();
+        List<String> encounteredMutex = new ArrayList<String>();
         Queue<String> queue = new ArrayDeque<>();
         for (String s : values) {
             queue.add(s);
@@ -297,12 +299,7 @@ public class ArgumentParser {
                         String value = queue.remove();
                         checkAndSet(current, value);
                     }
-                    if (namedArgs.contains(current.getName())) {
-                        NamedArgument currentNamedArgument = (NamedArgument) current;
-                        if (currentNamedArgument.hasMutualExclusiveArgs()) {
-                            encounteredMutuallyExclusiveNamedArgs.add(currentNamedArgument.getName());
-                        }
-                    }
+                    checkForMutexEncounter(current, encounteredMutex);
                 }
             } else if (arg.startsWith("-") && !arg.startsWith("--")) {
                 if (arg.length() > 2) {
@@ -331,6 +328,7 @@ public class ArgumentParser {
                             String value = queue.remove();
                             checkAndSet(longForm, value);
                         }
+                        checkForMutexEncounter(longForm, encounteredMutex);
                     }
                 }
             } else {
@@ -351,7 +349,7 @@ public class ArgumentParser {
             throw new MissingRequiredArgumentException(msg);
         }
         parseRequired(msg);
-        parseMutuallyExclusive(encounteredMutuallyExclusiveNamedArgs, msg);
+        parseMutuallyExclusive(encounteredMutex, msg);
     }
 
     /**
@@ -478,6 +476,16 @@ public class ArgumentParser {
                 throw new MissingRequiredArgumentException(msg);
             }
         }
+    }
+
+    private void checkForMutexEncounter(Argument current, List<String> encounteredMutuallyExclusiveNamedArgs) {
+        if (namedArgs.contains(current.getName())) {
+            NamedArgument currentNamedArgument = (NamedArgument) current;
+            if (currentNamedArgument.hasMutualExclusiveArgs()) {
+                encounteredMutuallyExclusiveNamedArgs.add(currentNamedArgument.getName());
+            }
+        }
+
     }
     //endregion
 
