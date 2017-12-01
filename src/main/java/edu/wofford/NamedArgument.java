@@ -12,7 +12,7 @@ import java.util.*;
  * NamedArgument arg = new NamedArgument("--type", "ellipsoid");
  * parser.setArgument(arg);
  * }
- * In the example, we create a NamedArgument object for an argument called "--type" with the default value of "ellipsoide".
+ * In the example, we create a NamedArgument object for an argument called "--type" with the default value of "ellipsoid".
  * We then can pass our NamedArgument into our ArgumentParser.
  * </pre>
  */
