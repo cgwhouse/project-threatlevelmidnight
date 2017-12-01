@@ -250,13 +250,17 @@ public class XML {
         arg.setType(attMap.get("type"));
         String[] array = acc.toArray(new String[acc.size()]);
         arg.addAcceptedValues(array);
-        if (!attMap.get("mutex").equals("")) {
-            arg.addMutuallyExclusiveArg(attMap.get("mutex"));
+        if (attMap.containsKey("mutex")){
+            if (!attMap.get("mutex").equals("")) {
+                arg.addMutuallyExclusiveArg(attMap.get("mutex"));
+            }
         }
-        if (!attMap.get("shortname").equals("")) {
-            parser.setNickname(arg, "-" + attMap.get("shortname"));
-        } else {
-            parser.setArgument(arg);
+        if (attMap.containsKey("shortname")){
+            if (!attMap.get("shortname").equals("")) {
+                parser.setNickname(arg, "-" + attMap.get("shortname"));
+            } else {
+                parser.setArgument(arg);
+            }
         }
     }
     //endregion
