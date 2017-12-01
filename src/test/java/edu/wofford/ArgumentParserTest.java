@@ -335,8 +335,7 @@ public class ArgumentParserTest {
 
     @Test
     public void testXMLParser() {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("testXMLParser.xml").getFile());
+        File file = new File("src/test/resources/testXMLParser.xml");
         String[] argumentValues = { "7", "5", "-t", "ellipsoid", "2" };
         parser.parseXML(file.getAbsolutePath());
         parser.setArgumentValues(argumentValues);
@@ -400,8 +399,7 @@ public class ArgumentParserTest {
 
     @Test
     public void testXMLAcceptedValuesOnly() {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("testXMLParser.xml").getFile());
+        File file = new File("src/test/resources/testXMLParser.xml");
         String[] argumentValues = { "7", "5", "-t", "ellipsoid", "2", "-d", "5" };
         parser.parseXML(file.getAbsolutePath());
         parser.setArgumentValues(argumentValues);
@@ -414,8 +412,7 @@ public class ArgumentParserTest {
     @Test
     public void testXMLAcceptedValuesError() {
         try {
-            ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader.getResource("testXMLParser.xml").getFile());
+            File file = new File("src/test/resources/testXMLParser.xml");
             String[] argumentValues = { "7", "5", "-t", "ellipsoid", "2", "-d", "6" };
             System.out.println(file.getAbsolutePath());
             parser.parseXML(file.getAbsolutePath());

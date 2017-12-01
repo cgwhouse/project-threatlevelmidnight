@@ -64,7 +64,11 @@ public class XML {
                 Argument arg = posMap.get(i);
                 parser.setArgument(arg);
             }
-        } catch (FileNotFoundException | XMLStreamException e) {
+        } catch (FileNotFoundException e) {
+            System.out.println(System.getProperty("user.dir"));
+            System.out.println(e);
+        }
+        catch (XMLStreamException e) {
             throw new BadXMLException();
         }
     }
