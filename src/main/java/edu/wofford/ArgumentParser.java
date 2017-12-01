@@ -242,6 +242,17 @@ public class ArgumentParser {
         return arg.getValue();
     }
 
+    /**
+     * Gets the values of the argument with the associated name.
+     * 
+     * @param name the name of the argument whose values are wanted
+     * @return     a list of string representations of the argument's values
+     */
+    public List<String> getValues(String name) {
+        Argument arg = argumentMap.get(name);
+        return arg.getMultipleValues();
+    }
+
     /** 
      * Gets the description of the argument with the associated name.
      *
@@ -339,7 +350,20 @@ public class ArgumentParser {
                     String posName = positionalArgs.get(positionalIndex);
                     positionalIndex++;
                     Argument current = argumentMap.get(posName);
-                    checkAndSet(current, arg);
+                    int n = current.getNumberOfValuesExpected();
+                    while (n > 0) {
+                        checkAndSet(current, arg);
+                        n--;
+                        if (n > 0) {
+                            try {
+                                arg = queue.remove();
+                            } catch (NoSuchElementException e) {
+                                msg += programName + ".java: error: argument " + current.getName() + " requires "
+                                        + current.getNumberOfValuesExpected() + " values";
+                                throw new NotEnoughValuesException(msg);
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -20,6 +20,7 @@ public class NamedArgument extends Argument {
     private String nicknames;
     private Boolean required;
     private List<String> mutuallyExclusiveNamedArgs;
+    private String value;
 
     /** 
      * Constructs an Argument object which requires the Argument name as a string and sets the value of the Argument.
@@ -29,7 +30,7 @@ public class NamedArgument extends Argument {
      */
     public NamedArgument(String name, String value) {
         super(name);
-        this.setValue(value);
+        this.value = value;
         nicknames = "-";
         required = false;
         mutuallyExclusiveNamedArgs = new ArrayList<String>();
@@ -42,7 +43,7 @@ public class NamedArgument extends Argument {
      */
     public NamedArgument(String name) {
         super(name);
-        this.setValue("");
+        value = "";
         nicknames = "-";
         required = true;
         mutuallyExclusiveNamedArgs = new ArrayList<String>();
@@ -55,6 +56,14 @@ public class NamedArgument extends Argument {
      */
     public void addNickname(String nickname) {
         nicknames += nickname;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
     }
 
     /** 

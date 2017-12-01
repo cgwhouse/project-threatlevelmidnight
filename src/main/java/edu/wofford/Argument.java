@@ -1,6 +1,8 @@
 package edu.wofford;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,10 +22,11 @@ import java.util.Set;
 public class Argument {
 
     private String name;
-    private String value;
     private String description;
     private String type;
     private Set<String> accepted;
+    private int numberOfValuesExpected;
+    private List<String> multipleValues;
 
     /** 
      * Constructs an Argument object which requires the Argument name as a string.
@@ -32,10 +35,11 @@ public class Argument {
      */
     public Argument(String name) {
         this.name = name;
-        value = "";
         description = "";
         type = "";
         accepted = new HashSet<String>();
+        multipleValues = new ArrayList<String>();
+        numberOfValuesExpected = 1;
     }
 
     /** 
@@ -44,7 +48,16 @@ public class Argument {
      * @param value the value of the Argument as a string
      */
     public void setValue(String value) {
-        this.value = value;
+        multipleValues.add(value);
+    }
+
+    /**
+     * Sets the number of values that the Argument is expecting, default is 1.
+     * 
+     * @param n an integer representing the number of values expected by the Argument
+     */
+    public void setNumberOfValuesExpected(int n) {
+        numberOfValuesExpected = n;
     }
 
     /** 
@@ -102,7 +115,16 @@ public class Argument {
      * @return string representing the value of the Argument
      */
     public String getValue() {
-        return value;
+        return multipleValues.get(0);
+    }
+
+    /**
+     * Gets the values of the Argument.
+     * 
+     * @return a list of strings representing the multiple values that the Argument has been assigned.
+     */
+    public List<String> getMultipleValues() {
+        return multipleValues;
     }
 
     /** 
@@ -121,6 +143,15 @@ public class Argument {
      */
     public String getType() {
         return type;
+    }
+
+    /**
+     * Returns the number of values that the argument is expecting.
+     * 
+     * @return an integer representing the number of values expected
+     */
+    public int getNumberOfValuesExpected() {
+        return numberOfValuesExpected;
     }
 
     /**
