@@ -39,8 +39,6 @@ public class NamedArgument extends Argument {
      * Constructs an Argument object which requires the Argument name as a string, required as a boolean and sets the value of the Argument.
      * 
      * @param name the name of the Argument
-     * @param value the value of the Argument
-     * @param required denotes whether the Argument is required
      */
     public NamedArgument(String name) {
         super(name);
@@ -82,62 +80,59 @@ public class NamedArgument extends Argument {
     }
 
     /** 
-     * Gets each short-form name for the Argument.
+     * Gets each short-form name for the NamedArgument.
      * 
-     * @return a single string containing a "-" followed by each of the short-form names for the Argument
+     * @return a single string containing a "-" followed by each of the short-form names for the NamedArgument
      */
     public String getNicknames() {
         return nicknames;
     }
 
     /** 
-     * Gets whether the Argument is required or not.
+     * Gets whether the NamedArgument is required.
      * 
-     * @return either true or false
+     * @return true if the NamedArgument is required, false otherwise
      */
-    public Boolean isRequired() {
+    public boolean isRequired() {
         return required;
     }
 
     /** 
-     * Gets whether the NamedArgument is mutually exclusive or not.
+     * Gets whether the NamedArgument is mutually exclusive.
      * 
-     * @return either true or false
+     * @return true if this NamedArgument has mutually exclusive NamedArguments, false otherwise
      */
-    public Boolean hasMutualExclusiveArgs() {
+    public boolean hasMutualExclusiveArgs() {
         if (mutuallyExclusiveNamedArgs.size() > 0) {
             return true;
         }
-        else {
-            return false;
-        }
+        return false;
     }
 
     /** 
      * Gets whether the NamedArgument is mutually exclusive or not to the provided NamedArgument.
      * 
-     * @return either true or false
+     * @param arg NamedArgument object representing the other NamedArgument we are checking
+     * @return    true if the current NamedArgument is mutually exclusive with the provided one, false 
+     *            otherwise
      */
-    public Boolean isMutuallyExclusive(NamedArgument arg) {
+    public boolean isMutuallyExclusive(NamedArgument arg) {
         if (mutuallyExclusiveNamedArgs.contains(arg.getName())) {
             return true;
         }
-        else {
-            return false;
-        }
+        return false;
     }
 
     /** 
-     * Gets whether the NamedArgument is mutually exclusive or not to the provided NamedArgument name as a string.
+     * Gets whether the NamedArgument is mutually exclusive with the provided NamedArgument.
      * 
-     * @return either true or false
+     * @param argName string representing the name of the other NamedArgument we are checking
+     * @return        either true or false
      */
-    public Boolean isMutuallyExclusive(String argName) {
+    public boolean isMutuallyExclusive(String argName) {
         if (mutuallyExclusiveNamedArgs.contains(argName)) {
             return true;
         }
-        else {
-            return false;
-        }
+        return false;
     }
 }
