@@ -9,7 +9,7 @@ public class NotEnoughValuesException extends ArgumentException {
     /** 
     * Constructs a NotEnoughValuesException with the specified detail message.
     *
-    * @param message the detail message
+    * @param msg the detail message
     */
     public NotEnoughValuesException(String msg) {
         super(msg);
