@@ -64,7 +64,11 @@ public class XML {
                 Argument arg = posMap.get(i);
                 parser.setArgument(arg);
             }
-        } catch (FileNotFoundException | XMLStreamException e) {
+        } catch (FileNotFoundException e) {
+            System.out.println(System.getProperty("user.dir"));
+            System.out.println(e);
+        }
+        catch (XMLStreamException e) {
             throw new BadXMLException();
         }
     }
@@ -250,13 +254,17 @@ public class XML {
         arg.setType(attMap.get("type"));
         String[] array = acc.toArray(new String[acc.size()]);
         arg.addAcceptedValues(array);
-        if (!attMap.get("mutex").equals("")) {
-            arg.addMutuallyExclusiveArg(attMap.get("mutex"));
+        if (attMap.containsKey("mutex")){
+            if (!attMap.get("mutex").equals("")) {
+                arg.addMutuallyExclusiveArg(attMap.get("mutex"));
+            }
         }
-        if (!attMap.get("shortname").equals("")) {
-            parser.setNickname(arg, "-" + attMap.get("shortname"));
-        } else {
-            parser.setArgument(arg);
+        if (attMap.containsKey("shortname")){
+            if (!attMap.get("shortname").equals("")) {
+                parser.setNickname(arg, "-" + attMap.get("shortname"));
+            } else {
+                parser.setArgument(arg);
+            }
         }
     }
     //endregion
