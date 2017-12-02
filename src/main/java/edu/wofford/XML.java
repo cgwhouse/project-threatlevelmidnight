@@ -194,7 +194,7 @@ public class XML {
                         NamedArgument namedArg = (NamedArgument)pair.getValue();
                         if (namedArg.hasMutualExclusiveArgs() && namedArg.isMutuallyExclusive(arg)) {
                             writer.writeStartElement("mutex");
-                            writer.writeCharacters(arg.getType());
+                            writer.writeCharacters(namedArg.getName());
                             writer.writeEndElement();
                         }
                     }
