@@ -182,11 +182,23 @@ public class XML {
                     writer.writeEndElement();
                 }
             }
+            writer.writeStartElement("required");
+            if (arg.isRequired()) {
+                writer.writeCharacters("true");
+                writer.writeEndElement();
+                writer.writeStartElement("default");
+                writer.writeCharacters("");
+                writer.writeEndElement();
+            }
+            else {
+                writer.writeCharacters("false");
+                writer.writeEndElement();
+                writer.writeStartElement("default");
+                writer.writeCharacters(arg.getValue());
+                writer.writeEndElement();
+            }
             writer.writeStartElement("type");
             writer.writeCharacters(arg.getType());
-            writer.writeEndElement();
-            writer.writeStartElement("default");
-            writer.writeCharacters(arg.getValue());
             writer.writeEndElement();
             if (arg.hasMutualExclusiveArgs()) {
                 for (Map.Entry<String, Argument> pair : argumentMap.entrySet()) {
@@ -250,7 +262,13 @@ public class XML {
     }
 
     private static void setNamedFromXML(Map<String, String> attMap, Set<String> acc, ArgumentParser parser) {
-        NamedArgument arg = new NamedArgument("--" + attMap.get("name"), attMap.get("default"));
+        NamedArgument arg;
+        if (attMap.containsKey("required")) {
+            arg = new NamedArgument("--" + attMap.get("name"));
+        }
+        else {
+            arg = new NamedArgument("--" + attMap.get("name"), attMap.get("default"));
+        }
         arg.setType(attMap.get("type"));
         String[] array = acc.toArray(new String[acc.size()]);
         arg.addAcceptedValues(array);

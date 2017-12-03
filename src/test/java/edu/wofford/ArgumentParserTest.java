@@ -351,8 +351,8 @@ public class ArgumentParserTest {
         expected += "<positional><name>length</name><type>float</type><position>1</position></positional>";
         expected += "<positional><name>width</name><type>float</type><position>2</position></positional>";
         expected += "<positional><name>height</name><type>float</type><position>3</position></positional>";
-        expected += "<named><name>type</name><shortname>t</shortname><type>string</type><default>box</default></named>";
-        expected += "<named><name>digits</name><type>integer</type><default>4</default></named>";
+        expected += "<named><name>type</name><shortname>t</shortname><required>false</required><default>box</default><type>string</type></named>";
+        expected += "<named><name>digits</name><required>false</required><default>4</default><type>integer</type></named>";
         expected += "</arguments>";
         for (int i = 0; i < argumentNames.length; i++) {
             Argument arg = new Argument(argumentNames[i]);
@@ -429,9 +429,9 @@ public class ArgumentParserTest {
         expected += "<positional><name>length</name><type>float</type><position>1</position></positional>";
         expected += "<positional><name>width</name><type>float</type><position>2</position></positional>";
         expected += "<positional><name>height</name><type>float</type><position>3</position></positional>";
-        expected += "<named><name>type</name><shortname>t</shortname><type>string</type><default>box</default>";
+        expected += "<named><name>type</name><shortname>t</shortname><required>false</required><default>box</default><type>string</type>";
         expected += "<accepted>pyramid</accepted><accepted>box</accepted><accepted>ellipsoid</accepted></named>";
-        expected += "<named><name>digits</name><type>integer</type><default>4</default></named>";
+        expected += "<named><name>digits</name><required>false</required><default>4</default><type>integer</type></named>";
         expected += "</arguments>";
         for (int i = 0; i < argumentNames.length; i++) {
             Argument arg = new Argument(argumentNames[i]);
@@ -447,6 +447,10 @@ public class ArgumentParserTest {
         digitsArg.setType("integer");
         parser.setArgument(digitsArg);
         String result = parser.createXML(false);
+        System.out.println("Expected\n");
+        System.out.println(expected);
+        System.out.println("\nResult\n");
+        System.out.println(result);
         assertEquals(expected, result);
     }
 
