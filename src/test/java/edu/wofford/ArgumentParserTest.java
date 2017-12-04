@@ -718,4 +718,27 @@ public class ArgumentParserTest {
             assertEquals(message, e.getMessage());
         }
     }
+
+    @Test
+    public void testRequiredNamedArgsAndMutexArgsRetrieve() {
+        String[] argumentValues = { "7", "5", "2", "--type", "square", "--color", "blue" };
+
+        NamedArgument argType = new NamedArgument("--type");
+        argType.setType("string");
+
+        NamedArgument argHue = new NamedArgument("--hue", "red");
+        argHue.setType("string");
+
+        NamedArgument argColor = new NamedArgument("--color", "green");
+        argColor.setType("string");
+        argColor.addMutuallyExclusiveArg(argHue);
+
+        parser.setArguments(argumentNames);
+        parser.setArgument(argType);
+        parser.setArgument(argHue);
+        parser.setArgument(argColor);
+        parser.setArgumentValues(argumentValues);
+
+        assertEquals("blue", parser.getValue("--color"));
+    }
 }
