@@ -1,7 +1,6 @@
 package edu.wofford;
 
 import java.io.File;
-import java.net.PasswordAuthentication;
 import java.util.List;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -566,7 +565,7 @@ public class ArgumentParserTest {
         NamedArgument reqArg = (NamedArgument) parser.getArg("--required");
         assertTrue(reqArg.isRequired());
         NamedArgument mutexArg = (NamedArgument) parser.getArg("--firstMutex");
-        assertTrue(mutexArg.getMutexArgs().contains("secondMutex"));
+        assertTrue(mutexArg.getMutexArgs().contains("--secondMutex"));
         assertEquals("testSecond", parser.getValue("--secondMutex"));
         assertEquals("test", parser.getValue("--firstMutex"));
     }
@@ -580,7 +579,7 @@ public class ArgumentParserTest {
         try {
             parser.setArgumentValues(argumentValues);
         } catch (MutuallyExclusiveArgumentException e) {
-            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are mutually exclusive: --firstMutex and --secondMutex";
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are mutually exclusive: --secondMutex and --firstMutex";
             assertEquals(message, e.getMessage());
         }
     }
