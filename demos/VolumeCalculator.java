@@ -24,6 +24,19 @@ public class VolumeCalculator {
         parser.setNickname(digitsArg, "-d");
 
         parser.setFlags("-asx");
+
+        NamedArgument testRequiredArg = new NamedArgument("--required");
+        testRequiredArg.setType("string");
+        parser.setArgument(testRequiredArg);
+
+        NamedArgument testMutexFirst = new NamedArgument("--multiply", "false");
+        NamedArgument testMutexSecond = new NamedArgument("--divide", "false");
+        testMutexFirst.addMutuallyExclusiveArg(testMutexSecond);
+        testMutexSecond.addMutuallyExclusiveArg(testMutexFirst);
+        testMutexFirst.setType("boolean");
+        testMutexSecond.setType("boolean");
+        parser.setArgument(testMutexFirst);
+        parser.setArgument(testMutexSecond);
         try {
             if (args.length == 0) {
                 String helpMessage = "\n";
@@ -36,6 +49,8 @@ public class VolumeCalculator {
                 helpMessage += "Possible values for --type are: box, pyramid, ellipsoid\n";
                 helpMessage += "-a adds 50 to the result and -s subtracts 75.\n";
                 helpMessage += "-x creates a file containing the argument information in xml format.\n";
+                helpMessage += "It is required to set --required to a string value, but its value has no effect.\n";
+                helpMessage += "--multiply and --divide are mutually exclusive.\n";
                 System.out.println(helpMessage);
                 String[] help = { "-h" };
                 parser.setArgumentValues(help);
@@ -56,6 +71,12 @@ public class VolumeCalculator {
                 }
                 if (parser.getValue("-s").equals("true")) {
                     result -= 75;
+                }
+                if (parser.getValue("--multiply").equals("true")) {
+                    result *= 2;
+                }
+                if (parser.getValue("--divide").equals("true")) {
+                    result /= 2;
                 }
                 if (parser.getValue("-x").equals("true")) {
                     parser.createXML(true);
