@@ -21,7 +21,8 @@ public class XML {
      */
     public static void parseXML(String filename, ArgumentParser parser) {
         int positionalCount = 0;
-        String[] fields = { "name", "shortname", "type", "position", "default", "required", "mutex", "accepted" };
+        String[] fields = { "name", "shortname", "type", "position", "default", "values", "required", "mutex",
+                "accepted" };
         Set<String> set = new HashSet<String>(Arrays.asList(fields));
         Set<String> accepted = new HashSet<String>();
         Set<String> mutex = new HashSet<String>();
@@ -32,6 +33,7 @@ public class XML {
             attMap.put(fields[i], "");
         }
         attMap.put("required", "false");
+        attMap.put("values", "1");
         try {
             XMLInputFactory factory = XMLInputFactory.newInstance();
             XMLEventReader eventReader = factory.createXMLEventReader(new FileReader(filename));
@@ -45,6 +47,7 @@ public class XML {
                         accepted.clear();
                         mutex.clear();
                         attMap.put("required", "false");
+                        attMap.put("values", "1");
                     }
                     if (set.contains(qName)) {
                         if (qName.equals("required")) {
@@ -159,6 +162,11 @@ public class XML {
             writer.writeStartElement("position");
             writer.writeCharacters(Integer.toString(position));
             writer.writeEndElement();
+            if (arg.getNumberOfValuesExpected() != 1) {
+                writer.writeStartElement("values");
+                writer.writeCharacters(Integer.toString(arg.getNumberOfValuesExpected()));
+                writer.writeEndElement();
+            }
             if (!arg.getAcceptedValues().isEmpty()) {
                 for (String value : arg.getAcceptedValues()) {
                     writer.writeStartElement("accepted");
@@ -260,6 +268,7 @@ public class XML {
             Set<String> acc) {
         Argument arg = new Argument(attMap.get("name"));
         arg.setType(attMap.get("type"));
+        arg.setNumberOfValuesExpected(Integer.parseInt(attMap.get("values")));
         String[] array = acc.toArray(new String[acc.size()]);
         arg.addAcceptedValues(array);
         posMap.put(Integer.parseInt(attMap.get("position")), arg);
