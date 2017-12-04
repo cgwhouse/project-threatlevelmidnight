@@ -26,7 +26,7 @@ public class NamedArgument extends Argument {
      * Constructs an Argument object which requires the Argument name as a string and sets the value of the Argument.
      * 
      * @param name the name of the Argument
-     * @param value the value of the Argument
+     * @param defaultValue the value of the Argument
      */
     public NamedArgument(String name, String defaultValue) {
         super(name);
