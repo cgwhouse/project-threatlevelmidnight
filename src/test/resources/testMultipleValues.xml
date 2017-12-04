@@ -1,0 +1,35 @@
+<arguments>
+	<positional>
+		<name>length</name>
+		<type>float</type>
+		<position>1</position>
+	</positional>
+	<positional>
+		<name>width</name>
+		<type>float</type>
+		<position>2</position>
+        <values>3</values>
+	</positional>
+	<positional>
+		<name>height</name>
+		<type>float</type>
+		<position>3</position>
+	</positional>
+	<named>
+		<name>type</name>
+		<shortname>t</shortname>
+		<type>string</type>
+		<default>box</default>
+		<accepted>box</accepted>
+		<accepted>pyramid</accepted>
+		<accepted>ellipsoid</accepted>
+	</named>
+	<named>
+		<name>digits</name>
+		<shortname>d</shortname>
+		<type>integer</type>
+		<default>4</default>
+		<accepted>4</accepted>
+		<accepted>5</accepted>
+	</named>
+</arguments>

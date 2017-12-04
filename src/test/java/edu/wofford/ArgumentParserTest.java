@@ -369,34 +369,6 @@ public class ArgumentParserTest {
     }
 
     @Test
-    public void TestAcceptedValuesSet() {
-        String[] argumentValues = { "7", "5", "-t", "ellipsoid", "2" };
-        parser.setArguments(argumentNames);
-        NamedArgument typeArg = new NamedArgument("--type", "box");
-        String[] accepted = { "box", "ellipsoid", "pyramid" };
-        typeArg.addAcceptedValues(accepted);
-        parser.setNickname(typeArg, "-t");
-        parser.setArgumentValues(argumentValues);
-        assertEquals("ellipsoid", parser.getValue("--type"));
-    }
-
-    @Test
-    public void testAcceptedValuesError() {
-        try {
-            String[] argumentValues = { "7", "5", "-t", "vape", "2" };
-            parser.setArguments(argumentNames);
-            NamedArgument typeArg = new NamedArgument("--type", "box");
-            String[] accepted = { "box", "ellipsoid", "pyramid" };
-            typeArg.addAcceptedValues(accepted);
-            parser.setNickname(typeArg, "-t");
-            parser.setArgumentValues(argumentValues);
-        } catch (UnacceptedValueException e) {
-            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: argument --type: unaccepted value: vape";
-            assertEquals(message, e.getMessage());
-        }
-    }
-
-    @Test
     public void testXMLAcceptedValuesOnly() {
         File file = new File("src/test/resources/testXMLParser.xml");
         String[] argumentValues = { "7", "5", "-t", "ellipsoid", "2", "-d", "5" };
@@ -471,50 +443,23 @@ public class ArgumentParserTest {
     }
 
     @Test
-    public void testRequiredNamedArgsRetrieve() {
-        String[] argumentValues = { "7", "5", "2", "--type", "square" };
-
-        NamedArgument arg = new NamedArgument("--type");
-        arg.setType("string");
-
-        parser.setArguments(argumentNames);
-        parser.setArgument(arg);
-        parser.setArgumentValues(argumentValues);
-
-        assertEquals("square", parser.getValue("--type"));
-    }
-
-    @Test
-    public void testRequiredNamedArgsShortform() {
-        try {
-            String[] values = { "7", "5", "2" };
-            parser.setArguments(argumentNames);
-            NamedArgument typeArg = new NamedArgument("--type");
-            typeArg.setType("string");
-            parser.setNickname(typeArg, "-t");
-            parser.setArgumentValues(values);
-        } catch (MissingRequiredArgumentException e) {
-            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are required: --type";
-            assertEquals(message, e.getMessage());
+    public void testCreateXMLRequiredNamedArgs() {
+        String expected = "<arguments>";
+        expected += "<positional><name>length</name><type>float</type><position>1</position></positional>";
+        expected += "<positional><name>width</name><type>float</type><position>2</position></positional>";
+        expected += "<positional><name>height</name><type>float</type><position>3</position></positional>";
+        expected += "<named><name>test</name><shortname>t</shortname><type>string</type><required></required></named>";
+        expected += "</arguments>";
+        for (int i = 0; i < argumentNames.length; i++) {
+            Argument arg = new Argument(argumentNames[i]);
+            arg.setType("float");
+            parser.setArgument(arg);
         }
-    }
-
-    @Test
-    public void testRequiredNamedArgsError() {
-        try {
-            String[] argumentValues = { "7", "5", "2", "--type", "square" };
-
-            NamedArgument arg1 = new NamedArgument("--type");
-            NamedArgument arg2 = new NamedArgument("--color");
-
-            parser.setArguments(argumentNames);
-            parser.setArgument(arg1);
-            parser.setArgument(arg2);
-            parser.setArgumentValues(argumentValues);
-        } catch (ArgumentException error) {
-            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are required: --color";
-            assertEquals(message, error.getMessage());
-        }
+        NamedArgument testArg = new NamedArgument("--test");
+        testArg.setType("string");
+        parser.setNickname(testArg, "-t");
+        String result = parser.createXML(false);
+        assertEquals(expected, result);
     }
 
     @Test
@@ -529,27 +474,6 @@ public class ArgumentParserTest {
         assertEquals("4", parser.getValue("--digits"));
         NamedArgument reqArg = (NamedArgument) parser.getArg("--required");
         assertTrue(reqArg.isRequired());
-    }
-
-    @Test
-    public void testCreateXMLRequiredNamedArgs() {
-        String expected = "<arguments>";
-        expected += "<positional><name>length</name><type>float</type><position>1</position></positional>";
-        expected += "<positional><name>width</name><type>float</type><position>2</position></positional>";
-        expected += "<positional><name>height</name><type>float</type><position>3</position></positional>";
-        expected += "<named><name>test</name><shortname>t</shortname><type>string</type><required></required></named>";
-        expected += "</arguments>";
-
-        for (int i = 0; i < argumentNames.length; i++) {
-            Argument arg = new Argument(argumentNames[i]);
-            arg.setType("float");
-            parser.setArgument(arg);
-        }
-        NamedArgument testArg = new NamedArgument("--test");
-        testArg.setType("string");
-        parser.setNickname(testArg, "-t");
-        String result = parser.createXML(false);
-        assertEquals(expected, result);
     }
 
     @Test
@@ -608,6 +532,124 @@ public class ArgumentParserTest {
         parser.setArgument(testArg2);
         String result = parser.createXML(false);
         assertEquals(expected, result);
+    }
+
+    @Test
+    public void testParseXMLMultipleValues() {
+        File file = new File("src/test/resources/testMultipleValues.xml");
+        String[] argumentValues = { "8", "4", "3", "5", "-t", "ellipsoid", "2" };
+        parser.parseXML(file.getAbsolutePath());
+        parser.setArgumentValues(argumentValues);
+        assertEquals("8", parser.getValue("length"));
+        assertEquals("float", parser.getType("width"));
+        assertEquals("ellipsoid", parser.getValue("--type"));
+        assertEquals("4", parser.getValue("-d"));
+        String[] values = { "4", "3", "5" };
+        Argument arg = parser.getArg("width");
+        assertEquals(3, arg.getNumberOfValuesExpected());
+        int i = 0;
+        for (String value : arg.getMultipleValues()) {
+            assertEquals(value, values[i]);
+            i++;
+        }
+    }
+
+    @Test
+    public void testCreateXMLMultipleValues() {
+        String expected = "<arguments>";
+        expected += "<positional><name>length</name><type>float</type><position>1</position></positional>";
+        expected += "<positional><name>width</name><type>float</type><position>2</position><values>3</values></positional>";
+        expected += "<positional><name>height</name><type>float</type><position>3</position></positional>";
+        expected += "</arguments>";
+        for (int i = 0; i < argumentNames.length; i++) {
+            if (argumentNames[i].equals("width")) {
+                Argument arg = new Argument(argumentNames[i]);
+                arg.setType("float");
+                arg.setNumberOfValuesExpected(3);
+                parser.setArgument(arg);
+            } else {
+                Argument arg = new Argument(argumentNames[i]);
+                arg.setType("float");
+                parser.setArgument(arg);
+            }
+        }
+        String result = parser.createXML(false);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void TestAcceptedValuesSet() {
+        String[] argumentValues = { "7", "5", "-t", "ellipsoid", "2" };
+        parser.setArguments(argumentNames);
+        NamedArgument typeArg = new NamedArgument("--type", "box");
+        String[] accepted = { "box", "ellipsoid", "pyramid" };
+        typeArg.addAcceptedValues(accepted);
+        parser.setNickname(typeArg, "-t");
+        parser.setArgumentValues(argumentValues);
+        assertEquals("ellipsoid", parser.getValue("--type"));
+    }
+
+    @Test
+    public void testAcceptedValuesError() {
+        try {
+            String[] argumentValues = { "7", "5", "-t", "vape", "2" };
+            parser.setArguments(argumentNames);
+            NamedArgument typeArg = new NamedArgument("--type", "box");
+            String[] accepted = { "box", "ellipsoid", "pyramid" };
+            typeArg.addAcceptedValues(accepted);
+            parser.setNickname(typeArg, "-t");
+            parser.setArgumentValues(argumentValues);
+        } catch (UnacceptedValueException e) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: argument --type: unaccepted value: vape";
+            assertEquals(message, e.getMessage());
+        }
+    }
+
+    @Test
+    public void testRequiredNamedArgsRetrieve() {
+        String[] argumentValues = { "7", "5", "2", "--type", "square" };
+
+        NamedArgument arg = new NamedArgument("--type");
+        arg.setType("string");
+
+        parser.setArguments(argumentNames);
+        parser.setArgument(arg);
+        parser.setArgumentValues(argumentValues);
+
+        assertEquals("square", parser.getValue("--type"));
+    }
+
+    @Test
+    public void testRequiredNamedArgsShortform() {
+        try {
+            String[] values = { "7", "5", "2" };
+            parser.setArguments(argumentNames);
+            NamedArgument typeArg = new NamedArgument("--type");
+            typeArg.setType("string");
+            parser.setNickname(typeArg, "-t");
+            parser.setArgumentValues(values);
+        } catch (MissingRequiredArgumentException e) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are required: --type";
+            assertEquals(message, e.getMessage());
+        }
+    }
+
+    @Test
+    public void testRequiredNamedArgsError() {
+        try {
+            String[] argumentValues = { "7", "5", "2", "--type", "square" };
+
+            NamedArgument arg1 = new NamedArgument("--type");
+            NamedArgument arg2 = new NamedArgument("--color");
+
+            parser.setArguments(argumentNames);
+            parser.setArgument(arg1);
+            parser.setArgument(arg2);
+            parser.setArgumentValues(argumentValues);
+        } catch (ArgumentException error) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are required: --color";
+            assertEquals(message, error.getMessage());
+        }
     }
 
     @Test
