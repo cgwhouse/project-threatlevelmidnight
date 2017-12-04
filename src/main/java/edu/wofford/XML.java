@@ -194,7 +194,7 @@ public class XML {
                 writer.writeEndElement();
             } else {
                 writer.writeStartElement("default");
-                writer.writeCharacters(arg.getValue());
+                writer.writeCharacters(arg.getDefault());
                 writer.writeEndElement();
             }
             if (arg.hasMutualExclusiveArgs()) {
@@ -248,7 +248,7 @@ public class XML {
             acc.add(characters.getData());
             break;
         case "mutex":
-            mutex.add(characters.getData());
+            mutex.add("--" + characters.getData());
             break;
         default:
             attMap.put(name, characters.getData());

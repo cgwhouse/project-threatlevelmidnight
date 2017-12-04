@@ -20,7 +20,7 @@ public class NamedArgument extends Argument {
     private String nicknames;
     private Boolean required;
     private List<String> mutexArgs;
-    private String value;
+    private String defaultValue;
 
     /** 
      * Constructs an Argument object which requires the Argument name as a string and sets the value of the Argument.
@@ -28,9 +28,10 @@ public class NamedArgument extends Argument {
      * @param name the name of the Argument
      * @param value the value of the Argument
      */
-    public NamedArgument(String name, String value) {
+    public NamedArgument(String name, String defaultValue) {
         super(name);
-        this.value = value;
+        this.defaultValue = defaultValue;
+        this.setValue(defaultValue);
         nicknames = "-";
         required = false;
         mutexArgs = new ArrayList<String>();
@@ -43,7 +44,7 @@ public class NamedArgument extends Argument {
      */
     public NamedArgument(String name) {
         super(name);
-        value = "";
+        defaultValue = "";
         nicknames = "-";
         required = true;
         mutexArgs = new ArrayList<String>();
@@ -58,12 +59,8 @@ public class NamedArgument extends Argument {
         nicknames += nickname;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
+    public String getDefault() {
+        return defaultValue;
     }
 
     public List<String> getMutexArgs() {

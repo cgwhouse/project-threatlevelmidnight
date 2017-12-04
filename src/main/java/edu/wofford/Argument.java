@@ -115,7 +115,7 @@ public class Argument {
      * @return string representing the value of the Argument
      */
     public String getValue() {
-        return multipleValues.get(0);
+        return multipleValues.get(multipleValues.size() - 1);
     }
 
     /**

@@ -496,7 +496,8 @@ public class ArgumentParser {
     private void parseRequired(String msg) {
         for (String name : namedArgs) {
             NamedArgument arg = (NamedArgument) argumentMap.get(name);
-            if (arg.isRequired() && arg.getValue().equals("")) {
+            List<String> values = arg.getMultipleValues();
+            if (arg.isRequired() && values.isEmpty()) {
                 msg += programName + ".java: error: the following arguments are required: " + name;
                 throw new MissingRequiredArgumentException(msg);
             }
