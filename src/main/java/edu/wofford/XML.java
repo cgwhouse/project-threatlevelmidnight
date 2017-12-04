@@ -21,15 +21,17 @@ public class XML {
      */
     public static void parseXML(String filename, ArgumentParser parser) {
         int positionalCount = 0;
-        String[] fields = { "name", "shortname", "type", "position", "default", "accepted" };
+        String[] fields = { "name", "shortname", "type", "position", "default", "required", "mutex", "accepted" };
         Set<String> set = new HashSet<String>(Arrays.asList(fields));
         Set<String> accepted = new HashSet<String>();
+        Set<String> mutex = new HashSet<String>();
         Map<Integer, Argument> posMap = new HashMap<Integer, Argument>();
         Map<String, String> attMap = new HashMap<String, String>();
 
-        for (int i = 0; i < fields.length - 1; i++) {
+        for (int i = 0; i < fields.length - 3; i++) {
             attMap.put(fields[i], "");
         }
+        attMap.put("required", "false");
         try {
             XMLInputFactory factory = XMLInputFactory.newInstance();
             XMLEventReader eventReader = factory.createXMLEventReader(new FileReader(filename));
@@ -41,9 +43,15 @@ public class XML {
                     String qName = startElement.getName().getLocalPart().toLowerCase();
                     if (qName.equals("positional") || qName.equals("named")) {
                         accepted.clear();
+                        mutex.clear();
+                        attMap.put("required", "false");
                     }
                     if (set.contains(qName)) {
-                        handleCharacters(qName, eventReader.nextEvent(), attMap, accepted);
+                        if (qName.equals("required")) {
+                            attMap.put("required", "true");
+                        } else {
+                            handleCharacters(qName, eventReader.nextEvent(), attMap, accepted, mutex);
+                        }
                     }
                     break;
                 case XMLStreamConstants.END_ELEMENT:
@@ -54,7 +62,7 @@ public class XML {
                             positionalCount++;
                             setPositionalFromXML(attMap, posMap, accepted);
                         } else if (endElement.getName().getLocalPart().equalsIgnoreCase("named")) {
-                            setNamedFromXML(attMap, accepted, parser);
+                            setNamedFromXML(attMap, accepted, mutex, parser);
                         }
                     }
                     break;
@@ -64,11 +72,7 @@ public class XML {
                 Argument arg = posMap.get(i);
                 parser.setArgument(arg);
             }
-        } catch (FileNotFoundException e) {
-            System.out.println(System.getProperty("user.dir"));
-            System.out.println(e);
-        }
-        catch (XMLStreamException e) {
+        } catch (FileNotFoundException | XMLStreamException e) {
             throw new BadXMLException();
         }
     }
@@ -182,31 +186,24 @@ public class XML {
                     writer.writeEndElement();
                 }
             }
-            writer.writeStartElement("required");
+            writer.writeStartElement("type");
+            writer.writeCharacters(arg.getType());
+            writer.writeEndElement();
             if (arg.isRequired()) {
-                writer.writeCharacters("true");
+                writer.writeStartElement("required");
                 writer.writeEndElement();
-                writer.writeStartElement("default");
-                writer.writeCharacters("");
-                writer.writeEndElement();
-            }
-            else {
-                writer.writeCharacters("false");
-                writer.writeEndElement();
+            } else {
                 writer.writeStartElement("default");
                 writer.writeCharacters(arg.getValue());
                 writer.writeEndElement();
             }
-            writer.writeStartElement("type");
-            writer.writeCharacters(arg.getType());
-            writer.writeEndElement();
             if (arg.hasMutualExclusiveArgs()) {
                 for (Map.Entry<String, Argument> pair : argumentMap.entrySet()) {
-                    if (pair.getKey().startsWith("--") && !pair.getKey().equals(arg.getName())){
-                        NamedArgument namedArg = (NamedArgument)pair.getValue();
+                    if (pair.getKey().startsWith("--") && !pair.getKey().equals(arg.getName())) {
+                        NamedArgument namedArg = (NamedArgument) pair.getValue();
                         if (namedArg.hasMutualExclusiveArgs() && namedArg.isMutuallyExclusive(arg)) {
                             writer.writeStartElement("mutex");
-                            writer.writeCharacters(namedArg.getName());
+                            writer.writeCharacters(namedArg.getName().substring(2));
                             writer.writeEndElement();
                         }
                     }
@@ -243,12 +240,19 @@ public class XML {
         }
     }
 
-    private static void handleCharacters(String name, XMLEvent event, Map<String, String> attMap, Set<String> acc) {
+    private static void handleCharacters(String name, XMLEvent event, Map<String, String> attMap, Set<String> acc,
+            Set<String> mutex) {
         Characters characters = event.asCharacters();
-        if (name.equals("accepted")) {
+        switch (name) {
+        case "accepted":
             acc.add(characters.getData());
-        } else {
+            break;
+        case "mutex":
+            mutex.add(characters.getData());
+            break;
+        default:
             attMap.put(name, characters.getData());
+            break;
         }
     }
 
@@ -261,28 +265,31 @@ public class XML {
         posMap.put(Integer.parseInt(attMap.get("position")), arg);
     }
 
-    private static void setNamedFromXML(Map<String, String> attMap, Set<String> acc, ArgumentParser parser) {
+    private static void setNamedFromXML(Map<String, String> attMap, Set<String> acc, Set<String> mutex,
+            ArgumentParser parser) {
         NamedArgument arg;
-        if (attMap.containsKey("required")) {
+        if (attMap.get("required").equals("true")) {
             arg = new NamedArgument("--" + attMap.get("name"));
-        }
-        else {
+        } else {
             arg = new NamedArgument("--" + attMap.get("name"), attMap.get("default"));
         }
         arg.setType(attMap.get("type"));
-        String[] array = acc.toArray(new String[acc.size()]);
-        arg.addAcceptedValues(array);
-        if (attMap.containsKey("mutex")){
-            if (!attMap.get("mutex").equals("")) {
-                arg.addMutuallyExclusiveArg(attMap.get("mutex"));
+        String[] accepted = acc.toArray(new String[acc.size()]);
+        arg.addAcceptedValues(accepted);
+        if (!mutex.isEmpty()) {
+            String[] mutexes = mutex.toArray(new String[mutex.size()]);
+            for (int i = 0; i < mutexes.length; i++) {
+                arg.addMutuallyExclusiveArg(mutexes[i]);
             }
         }
-        if (attMap.containsKey("shortname")){
+        if (attMap.containsKey("shortname")) {
             if (!attMap.get("shortname").equals("")) {
                 parser.setNickname(arg, "-" + attMap.get("shortname"));
             } else {
                 parser.setArgument(arg);
             }
+        } else {
+            parser.setArgument(arg);
         }
     }
     //endregion

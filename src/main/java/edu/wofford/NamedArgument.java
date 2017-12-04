@@ -19,7 +19,7 @@ import java.util.*;
 public class NamedArgument extends Argument {
     private String nicknames;
     private Boolean required;
-    private List<String> mutuallyExclusiveNamedArgs;
+    private List<String> mutexArgs;
     private String value;
 
     /** 
@@ -33,7 +33,7 @@ public class NamedArgument extends Argument {
         this.value = value;
         nicknames = "-";
         required = false;
-        mutuallyExclusiveNamedArgs = new ArrayList<String>();
+        mutexArgs = new ArrayList<String>();
     }
 
     /** 
@@ -46,7 +46,7 @@ public class NamedArgument extends Argument {
         value = "";
         nicknames = "-";
         required = true;
-        mutuallyExclusiveNamedArgs = new ArrayList<String>();
+        mutexArgs = new ArrayList<String>();
     }
 
     /** 
@@ -66,14 +66,18 @@ public class NamedArgument extends Argument {
         return value;
     }
 
+    public List<String> getMutexArgs() {
+        return mutexArgs;
+    }
+
     /** 
      * Adds the name of the Argument to the list that holds mutually exclusive Argument names.
      * 
      * @param argName the name of the Argument as a string
      */
     public void addMutuallyExclusiveArg(String argName) {
-        if (!mutuallyExclusiveNamedArgs.contains(argName)) {
-            mutuallyExclusiveNamedArgs.add(argName);
+        if (!mutexArgs.contains(argName)) {
+            mutexArgs.add(argName);
         }
     }
 
@@ -83,8 +87,8 @@ public class NamedArgument extends Argument {
      * @param arg the NamedArgument
      */
     public void addMutuallyExclusiveArg(NamedArgument arg) {
-        if (!mutuallyExclusiveNamedArgs.contains(arg.getName())) {
-            mutuallyExclusiveNamedArgs.add(arg.getName());
+        if (!mutexArgs.contains(arg.getName())) {
+            mutexArgs.add(arg.getName());
         }
     }
 
@@ -112,7 +116,7 @@ public class NamedArgument extends Argument {
      * @return true if this NamedArgument has mutually exclusive NamedArguments, false otherwise
      */
     public boolean hasMutualExclusiveArgs() {
-        if (mutuallyExclusiveNamedArgs.size() > 0) {
+        if (mutexArgs.size() > 0) {
             return true;
         }
         return false;
@@ -126,7 +130,7 @@ public class NamedArgument extends Argument {
      *            otherwise
      */
     public boolean isMutuallyExclusive(NamedArgument arg) {
-        if (mutuallyExclusiveNamedArgs.contains(arg.getName())) {
+        if (mutexArgs.contains(arg.getName())) {
             return true;
         }
         return false;
@@ -139,7 +143,7 @@ public class NamedArgument extends Argument {
      * @return        either true or false
      */
     public boolean isMutuallyExclusive(String argName) {
-        if (mutuallyExclusiveNamedArgs.contains(argName)) {
+        if (mutexArgs.contains(argName)) {
             return true;
         }
         return false;

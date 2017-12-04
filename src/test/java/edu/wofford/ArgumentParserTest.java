@@ -351,8 +351,8 @@ public class ArgumentParserTest {
         expected += "<positional><name>length</name><type>float</type><position>1</position></positional>";
         expected += "<positional><name>width</name><type>float</type><position>2</position></positional>";
         expected += "<positional><name>height</name><type>float</type><position>3</position></positional>";
-        expected += "<named><name>type</name><shortname>t</shortname><required>false</required><default>box</default><type>string</type></named>";
-        expected += "<named><name>digits</name><required>false</required><default>4</default><type>integer</type></named>";
+        expected += "<named><name>type</name><shortname>t</shortname><type>string</type><default>box</default></named>";
+        expected += "<named><name>digits</name><type>integer</type><default>4</default></named>";
         expected += "</arguments>";
         for (int i = 0; i < argumentNames.length; i++) {
             Argument arg = new Argument(argumentNames[i]);
@@ -414,7 +414,6 @@ public class ArgumentParserTest {
         try {
             File file = new File("src/test/resources/testXMLParser.xml");
             String[] argumentValues = { "7", "5", "-t", "ellipsoid", "2", "-d", "6" };
-            System.out.println(file.getAbsolutePath());
             parser.parseXML(file.getAbsolutePath());
             parser.setArgumentValues(argumentValues);
         } catch (UnacceptedValueException e) {
@@ -429,9 +428,9 @@ public class ArgumentParserTest {
         expected += "<positional><name>length</name><type>float</type><position>1</position></positional>";
         expected += "<positional><name>width</name><type>float</type><position>2</position></positional>";
         expected += "<positional><name>height</name><type>float</type><position>3</position></positional>";
-        expected += "<named><name>type</name><shortname>t</shortname><required>false</required><default>box</default><type>string</type>";
+        expected += "<named><name>type</name><shortname>t</shortname><type>string</type><default>box</default>";
         expected += "<accepted>pyramid</accepted><accepted>box</accepted><accepted>ellipsoid</accepted></named>";
-        expected += "<named><name>digits</name><required>false</required><default>4</default><type>integer</type></named>";
+        expected += "<named><name>digits</name><type>integer</type><default>4</default></named>";
         expected += "</arguments>";
         for (int i = 0; i < argumentNames.length; i++) {
             Argument arg = new Argument(argumentNames[i]);
@@ -447,10 +446,6 @@ public class ArgumentParserTest {
         digitsArg.setType("integer");
         parser.setArgument(digitsArg);
         String result = parser.createXML(false);
-        System.out.println("Expected\n");
-        System.out.println(expected);
-        System.out.println("\nResult\n");
-        System.out.println(result);
         assertEquals(expected, result);
     }
 
@@ -524,7 +519,100 @@ public class ArgumentParserTest {
     }
 
     @Test
-    public void testMutuallyExclusiveRequiredNamedArgsError() {
+    public void testParseXMLRequiredNamedArgs() {
+        File file = new File("src/test/resources/testRequiredMutexXML.xml");
+        String[] argumentValues = { "7", "5", "-t", "box", "2", "--required", "test" };
+        parser.parseXML(file.getAbsolutePath());
+        parser.setArgumentValues(argumentValues);
+        assertEquals("7", parser.getValue("length"));
+        assertEquals("float", parser.getType("width"));
+        assertEquals("box", parser.getValue("--type"));
+        assertEquals("4", parser.getValue("--digits"));
+        NamedArgument reqArg = (NamedArgument) parser.getArg("--required");
+        assertTrue(reqArg.isRequired());
+    }
+
+    @Test
+    public void testCreateXMLRequiredNamedArgs() {
+        String expected = "<arguments>";
+        expected += "<positional><name>length</name><type>float</type><position>1</position></positional>";
+        expected += "<positional><name>width</name><type>float</type><position>2</position></positional>";
+        expected += "<positional><name>height</name><type>float</type><position>3</position></positional>";
+        expected += "<named><name>test</name><shortname>t</shortname><type>string</type><required></required></named>";
+        expected += "</arguments>";
+
+        for (int i = 0; i < argumentNames.length; i++) {
+            Argument arg = new Argument(argumentNames[i]);
+            arg.setType("float");
+            parser.setArgument(arg);
+        }
+        NamedArgument testArg = new NamedArgument("--test");
+        testArg.setType("string");
+        parser.setNickname(testArg, "-t");
+        String result = parser.createXML(false);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testParseXMLMutex() {
+        File file = new File("src/test/resources/testRequiredMutexXML.xml");
+        String[] argumentValues = { "7", "5", "-t", "box", "2", "--required", "test", "--firstMutex", "test" };
+        parser.parseXML(file.getAbsolutePath());
+        parser.setArgumentValues(argumentValues);
+        assertEquals("7", parser.getValue("length"));
+        assertEquals("float", parser.getType("width"));
+        assertEquals("box", parser.getValue("--type"));
+        assertEquals("4", parser.getValue("--digits"));
+        NamedArgument reqArg = (NamedArgument) parser.getArg("--required");
+        assertTrue(reqArg.isRequired());
+        NamedArgument mutexArg = (NamedArgument) parser.getArg("--firstMutex");
+        assertTrue(mutexArg.getMutexArgs().contains("secondMutex"));
+        assertEquals("testSecond", parser.getValue("--secondMutex"));
+        assertEquals("test", parser.getValue("--firstMutex"));
+    }
+
+    @Test
+    public void testParseXMLMutexError() {
+        File file = new File("src/test/resources/testRequiredMutexXML.xml");
+        String[] argumentValues = { "7", "5", "-t", "box", "2", "--required", "test", "--firstMutex", "test",
+                "--secondMutex", "test" };
+        parser.parseXML(file.getAbsolutePath());
+        try {
+            parser.setArgumentValues(argumentValues);
+        } catch (MutuallyExclusiveArgumentException e) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are mutually exclusive: --firstMutex and --secondMutex";
+            assertEquals(message, e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCreateXMLMutex() {
+        String expected = "<arguments>";
+        expected += "<positional><name>length</name><type>float</type><position>1</position></positional>";
+        expected += "<positional><name>width</name><type>float</type><position>2</position></positional>";
+        expected += "<positional><name>height</name><type>float</type><position>3</position></positional>";
+        expected += "<named><name>firstMutex</name><shortname>f</shortname><type>string</type><default>testFirst</default><mutex>secondMutex</mutex></named>";
+        expected += "<named><name>secondMutex</name><type>string</type><default>testSecond</default><mutex>firstMutex</mutex></named>";
+        expected += "</arguments>";
+        for (int i = 0; i < argumentNames.length; i++) {
+            Argument arg = new Argument(argumentNames[i]);
+            arg.setType("float");
+            parser.setArgument(arg);
+        }
+        NamedArgument testArg = new NamedArgument("--firstMutex", "testFirst");
+        testArg.setType("string");
+        NamedArgument testArg2 = new NamedArgument("--secondMutex", "testSecond");
+        testArg2.setType("string");
+        testArg.addMutuallyExclusiveArg(testArg2);
+        testArg2.addMutuallyExclusiveArg(testArg);
+        parser.setNickname(testArg, "-f");
+        parser.setArgument(testArg2);
+        String result = parser.createXML(false);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testMutuallyExclusiveArgsError() {
         try {
             String[] argumentValues = { "7", "5", "2", "--type", "square", "--shape", "circle" };
 
@@ -543,7 +631,7 @@ public class ArgumentParserTest {
     }
 
     @Test
-    public void testDifferentSetsOfMutuallyExclusiveRequiredNamedArgsError() {
+    public void testDifferentSetsOfMutuallyExclusiveArgsError() {
         try {
             String[] argumentValues = { "7", "5", "2", "--color", "blue", "--shape", "circle", "--hue", "red",
                     "--test1", "1" };

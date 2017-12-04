@@ -17,9 +17,8 @@
 	<named>
 		<name>type</name>
 		<shortname>t</shortname>
-		<required>false</required>
-		<default>box</default>
 		<type>string</type>
+		<default>box</default>
 		<accepted>box</accepted>
 		<accepted>pyramid</accepted>
 		<accepted>ellipsoid</accepted>
@@ -27,9 +26,8 @@
 	<named>
 		<name>digits</name>
 		<shortname>d</shortname>
-		<required>false</required>
-		<default>4</default>
 		<type>integer</type>
+		<default>4</default>
 		<accepted>4</accepted>
 		<accepted>5</accepted>
 	</named>

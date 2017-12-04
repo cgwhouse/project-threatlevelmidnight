@@ -274,6 +274,10 @@ public class ArgumentParser {
         Argument arg = argumentMap.get(name);
         return arg.getType();
     }
+
+    public Argument getArg(String name) {
+        return argumentMap.get(name);
+    }
     //endregion
 
     /**
@@ -459,16 +463,13 @@ public class ArgumentParser {
     private String checkMutuallyExclusiveNamedArgs(List<String> mutuallyExclusiveArgs,
             NamedArgument mutuallyExclusiveArg) {
         String retVal = "";
-
         for (String argName : mutuallyExclusiveArgs) {
             NamedArgument arg = (NamedArgument) argumentMap.get(argName);
-
             if (mutuallyExclusiveArg.isMutuallyExclusive(argName)
                     || arg.isMutuallyExclusive(mutuallyExclusiveArg.getName())) {
                 return argName;
             }
         }
-
         return retVal;
     }
 
