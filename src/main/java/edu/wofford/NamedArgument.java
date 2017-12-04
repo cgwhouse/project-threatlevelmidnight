@@ -59,18 +59,28 @@ public class NamedArgument extends Argument {
         nicknames += nickname;
     }
 
+    /** 
+     * Gets the default value of the NamedArgument.
+     * 
+     * @return the default value of the NamedArgument
+     */
     public String getDefault() {
         return defaultValue;
     }
 
+    /** 
+     * Gets a list of the mutually exclusive arguments that are mutually exclusive with the NamedArgument.
+     * 
+     * @return the list of argument names that are mutually exclusive with the NamedArgument
+     */
     public List<String> getMutexArgs() {
         return mutexArgs;
     }
 
     /** 
-     * Adds the name of the Argument to the list that holds mutually exclusive Argument names.
+     * Adds the name of the argument to the list that holds mutually exclusive argument names.
      * 
-     * @param argName the name of the Argument as a string
+     * @param argName the name of the argument as a string
      */
     public void addMutuallyExclusiveArg(String argName) {
         if (!mutexArgs.contains(argName)) {
@@ -79,7 +89,7 @@ public class NamedArgument extends Argument {
     }
 
     /** 
-     * Adds the name of the Argument to the list that holds mutually exclusive Argument names.
+     * Adds the name of the argument to the list that holds mutually exclusive argument names.
      * 
      * @param arg the NamedArgument
      */
