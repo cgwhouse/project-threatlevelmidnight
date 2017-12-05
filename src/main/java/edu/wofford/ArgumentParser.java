@@ -306,56 +306,19 @@ public class ArgumentParser {
             if (arg.equals("-h") || arg.equals("--help")) {
                 help();
             } else if (arg.startsWith("--")) {
-                if (argumentMap.containsKey(arg)) {
-                    Argument current = argumentMap.get(arg);
-                    if (current.getType().equals("boolean")) {
-                        checkAndSet(current, "true");
-                    } else {
-                        String value = queue.remove();
-                        checkAndSet(current, value);
-                    }
-                    checkForMutexEncounter(current, encounteredMutex);
-                }
+                parseNamed(arg, queue, encounteredMutex);
             } else if (arg.startsWith("-") && !arg.startsWith("--")) {
                 if (arg.length() > 2) {
-                    for (int i = 1; i < arg.length(); i++) {
-                        String name = "-" + Character.toString(arg.charAt(i));
-                        if (argumentMap.containsKey(name)) {
-                            //Argument flag = argumentMap.get(name);
-                            checkAndSet(argumentMap.get(name), "true");
-                        } else if (shortFormMap.containsKey(name)) {
-                            //Argument longForm = argumentMap.get(shortFormMap.get(name));
-                            checkAndSet(argumentMap.get(shortFormMap.get(name)), "true");
-                        } else {
-                            msg += programName + ".java: error: unrecognized flag: " + name;
-                            throw new UnrecognizedArgumentException(msg);
-                        }
-                    }
+                    parseMultipleFlags(arg, msg);
                 } else {
-                    if (argumentMap.containsKey(arg)) {
-                        Argument flag = argumentMap.get(arg);
-                        checkAndSet(flag, "true");
-                    } else if (shortFormMap.containsKey(arg)) {
-                        Argument longForm = argumentMap.get(shortFormMap.get(arg));
-                        if (longForm.getType().equals("boolean")) {
-                            checkAndSet(longForm, "true");
-                        } else {
-                            String value = queue.remove();
-                            checkAndSet(longForm, value);
-                        }
-                        checkForMutexEncounter(longForm, encounteredMutex);
-                    }
+                    parseShortform(arg, queue, encounteredMutex);
                 }
             } else {
                 if (positionalIndex >= positionalArgs.size()) {
                     msg += programName + ".java: error: unrecognized arguments: " + arg;
                     throw new UnrecognizedArgumentException(msg);
                 } else {
-                    String posName = positionalArgs.get(positionalIndex);
-                    positionalIndex++;
-                    Argument current = argumentMap.get(posName);
-                    int n = current.getNumberOfValuesExpected();
-                    checkAndSet(current, arg, n, queue);
+                    positionalIndex = parsePositional(positionalIndex, arg, queue);
                 }
             }
         }
@@ -388,6 +351,52 @@ public class ArgumentParser {
     }
 
     //region Private Methods
+    private void parseNamed(String arg, Queue<String> queue, List<String> encounteredMutex) {
+        if (argumentMap.containsKey(arg)) {
+            Argument current = argumentMap.get(arg);
+            if (current.getType().equals("boolean")) {
+                checkAndSet(current, "true");
+            } else {
+                String value = queue.remove();
+                checkAndSet(current, value);
+            }
+            checkForMutexEncounter(current, encounteredMutex);
+        }
+    }
+
+    private void parseMultipleFlags(String arg, String msg) {
+        for (int i = 1; i < arg.length(); i++) {
+            String name = "-" + Character.toString(arg.charAt(i));
+            if (argumentMap.containsKey(name)) {
+                checkAndSet(argumentMap.get(name), "true");
+            } else if (shortFormMap.containsKey(name)) {
+                checkAndSet(argumentMap.get(shortFormMap.get(name)), "true");
+            } else {
+                msg += programName + ".java: error: unrecognized flag: " + name;
+                throw new UnrecognizedArgumentException(msg);
+            }
+        }
+    }
+
+    private void parseShortform(String arg, Queue<String> queue, List<String> encounteredMutex) {
+        if (argumentMap.containsKey(arg)) {
+            Argument flag = argumentMap.get(arg);
+            checkAndSet(flag, "true");
+        } else if (shortFormMap.containsKey(arg)) {
+            String longForm = argumentMap.get(shortFormMap.get(arg)).getName();
+            parseNamed(longForm, queue, encounteredMutex);
+        }
+    }
+
+    private int parsePositional(int positionalIndex, String arg, Queue<String> queue) {
+        String posName = positionalArgs.get(positionalIndex);
+        positionalIndex++;
+        Argument current = argumentMap.get(posName);
+        int n = current.getNumberOfValuesExpected();
+        checkAndSet(current, arg, n, queue);
+        return positionalIndex;
+    }
+
     private void help() {
         String message = makeUsageMessage();
         String decrArgs = "positional arguments:\n";
@@ -414,6 +423,23 @@ public class ArgumentParser {
 
     private String makeUsageMessage() {
         return "usage: java " + programName + " " + makeString(positionalArgs) + "\n";
+    }
+
+    private void checkAndSet(Argument current, String argValue, int valuesCount, Queue<String> remainingValues) {
+        while (valuesCount > 0) {
+            checkAndSet(current, argValue);
+            valuesCount--;
+            if (valuesCount > 0) {
+                try {
+                    argValue = remainingValues.remove();
+                } catch (NoSuchElementException e) {
+                    String msg = makeUsageMessage();
+                    msg += programName + ".java: error: argument " + current.getName() + " requires "
+                            + current.getNumberOfValuesExpected() + " values";
+                    throw new NotEnoughValuesException(msg);
+                }
+            }
+        }
     }
 
     private void checkAndSet(Argument current, String value) {
@@ -504,23 +530,6 @@ public class ArgumentParser {
             }
         }
 
-    }
-
-    private void checkAndSet(Argument current, String argValue, int valuesCount, Queue<String> remainingValues) {
-        while (valuesCount > 0) {
-            checkAndSet(current, argValue);
-            valuesCount--;
-            if (valuesCount > 0) {
-                try {
-                    argValue = remainingValues.remove();
-                } catch (NoSuchElementException e) {
-                    String msg = makeUsageMessage();
-                    msg += programName + ".java: error: argument " + current.getName() + " requires "
-                            + current.getNumberOfValuesExpected() + " values";
-                    throw new NotEnoughValuesException(msg);
-                }
-            }
-        }
     }
     //endregion
 
