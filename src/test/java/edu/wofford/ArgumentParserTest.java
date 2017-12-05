@@ -271,11 +271,14 @@ public class ArgumentParserTest {
 
             NamedArgument arg = new NamedArgument("--hue", "3");
             arg.setType("int");
-            parser.setNickname(arg, "hue");
-
+            arg.setDescription("test description (int)");
+            parser.setNickname(arg, "-h");
             parser.setArgumentValues(argumentValues);
         } catch (ArgumentException error) {
-            String message = "usage: java VolumeCalculator length width height\nCalculate the volume of a box.\npositional arguments:\nlength the length of the box (float)\nwidth the width of the box (float)\nheight the height of the box (float)";
+            String message = "usage: java VolumeCalculator length width height\nCalculate the volume of a box.";
+            message += "\npositional arguments:\nlength the length of the box (float)\n";
+            message += "width the width of the box (float)\nheight the height of the box (float)\n";
+            message += "--hue test description (int)";
             assertEquals(message, error.getMessage());
         }
     }

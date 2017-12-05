@@ -408,6 +408,10 @@ public class ArgumentParser {
             Argument arg = argumentMap.get(name);
             decrArgs += name + " " + arg.getDescription() + "\n";
         }
+        for (String name : namedArgs) {
+            Argument arg = argumentMap.get(name);
+            decrArgs += name + " " + arg.getDescription() + "\n";
+        }
         message += decrArgs.trim();
         throw new HelpException(message);
     }
