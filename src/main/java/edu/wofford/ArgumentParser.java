@@ -294,13 +294,13 @@ public class ArgumentParser {
      *                                            time
      */
     public void setArgumentValues(String[] values) {
-        List<String> encounteredMutex = new ArrayList<String>();
         Queue<String> queue = new ArrayDeque<>();
         for (String s : values) {
             queue.add(s);
         }
         String msg = makeUsageMessage();
         int positionalIndex = 0;
+        List<String> encounteredMutex = new ArrayList<String>();
         while (!queue.isEmpty()) {
             String arg = queue.remove();
             if (arg.equals("-h") || arg.equals("--help")) {
@@ -309,7 +309,7 @@ public class ArgumentParser {
                 if (argumentMap.containsKey(arg)) {
                     Argument current = argumentMap.get(arg);
                     if (current.getType().equals("boolean")) {
-                        current.setValue("true");
+                        checkAndSet(current, "true");
                     } else {
                         String value = queue.remove();
                         checkAndSet(current, value);
@@ -321,11 +321,11 @@ public class ArgumentParser {
                     for (int i = 1; i < arg.length(); i++) {
                         String name = "-" + Character.toString(arg.charAt(i));
                         if (argumentMap.containsKey(name)) {
-                            Argument flag = argumentMap.get(name);
-                            flag.setValue("true");
+                            //Argument flag = argumentMap.get(name);
+                            checkAndSet(argumentMap.get(name), "true");
                         } else if (shortFormMap.containsKey(name)) {
-                            Argument longForm = argumentMap.get(shortFormMap.get(name));
-                            longForm.setValue("true");
+                            //Argument longForm = argumentMap.get(shortFormMap.get(name));
+                            checkAndSet(argumentMap.get(shortFormMap.get(name)), "true");
                         } else {
                             msg += programName + ".java: error: unrecognized flag: " + name;
                             throw new UnrecognizedArgumentException(msg);
@@ -334,11 +334,11 @@ public class ArgumentParser {
                 } else {
                     if (argumentMap.containsKey(arg)) {
                         Argument flag = argumentMap.get(arg);
-                        flag.setValue("true");
+                        checkAndSet(flag, "true");
                     } else if (shortFormMap.containsKey(arg)) {
                         Argument longForm = argumentMap.get(shortFormMap.get(arg));
                         if (longForm.getType().equals("boolean")) {
-                            longForm.setValue("true");
+                            checkAndSet(longForm, "true");
                         } else {
                             String value = queue.remove();
                             checkAndSet(longForm, value);
@@ -355,19 +355,7 @@ public class ArgumentParser {
                     positionalIndex++;
                     Argument current = argumentMap.get(posName);
                     int n = current.getNumberOfValuesExpected();
-                    while (n > 0) {
-                        checkAndSet(current, arg);
-                        n--;
-                        if (n > 0) {
-                            try {
-                                arg = queue.remove();
-                            } catch (NoSuchElementException e) {
-                                msg += programName + ".java: error: argument " + current.getName() + " requires "
-                                        + current.getNumberOfValuesExpected() + " values";
-                                throw new NotEnoughValuesException(msg);
-                            }
-                        }
-                    }
+                    checkAndSet(current, arg, n, queue);
                 }
             }
         }
@@ -516,6 +504,23 @@ public class ArgumentParser {
             }
         }
 
+    }
+
+    private void checkAndSet(Argument current, String argValue, int valuesCount, Queue<String> remainingValues) {
+        while (valuesCount > 0) {
+            checkAndSet(current, argValue);
+            valuesCount--;
+            if (valuesCount > 0) {
+                try {
+                    argValue = remainingValues.remove();
+                } catch (NoSuchElementException e) {
+                    String msg = makeUsageMessage();
+                    msg += programName + ".java: error: argument " + current.getName() + " requires "
+                            + current.getNumberOfValuesExpected() + " values";
+                    throw new NotEnoughValuesException(msg);
+                }
+            }
+        }
     }
     //endregion
 
