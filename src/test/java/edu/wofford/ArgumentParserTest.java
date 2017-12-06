@@ -730,6 +730,36 @@ public class ArgumentParserTest {
     }
 
     @Test
+    public void testMultipleFlagsAtOnceMutex() {
+        String[] values = { "7", "5", "2", "-as" };
+        for (String name : argumentNames) {
+            Argument arg = new Argument(name);
+            arg.setType("float");
+            parser.setArgument(arg);
+        }
+        NamedArgument addArg = new NamedArgument("--add", "false");
+        addArg.addAcceptedValue("true");
+        addArg.addAcceptedValue("false");
+        addArg.setType("boolean");
+        addArg.setDescription("If true, adds 5 to the answer (false by default).");
+        addArg.addMutuallyExclusiveArg("--subtract");
+        parser.setNickname(addArg, "-a");
+        NamedArgument subArg = new NamedArgument("--subtract", "false");
+        subArg.addAcceptedValue("true");
+        subArg.addAcceptedValue("false");
+        subArg.setType("boolean");
+        subArg.setDescription("If true, subtracts 5 from the answer (false by default).");
+        subArg.addMutuallyExclusiveArg("--add");
+        parser.setNickname(subArg, "-s");
+        try {
+            parser.setArgumentValues(values);
+        } catch (MutuallyExclusiveArgumentException e) {
+            String message = "usage: java VolumeCalculator length width height\nVolumeCalculator.java: error: the following arguments are mutually exclusive: --subtract and --add";
+            assertEquals(message, e.getMessage());
+        }
+    }
+
+    @Test
     public void testPositionalHasMultipleValues() {
         String[] values = { "1", "2", "3", "5", "2" };
         Argument length = new Argument("length");

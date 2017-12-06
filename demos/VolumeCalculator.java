@@ -16,12 +16,14 @@ public class VolumeCalculator {
 
         NamedArgument typeArg = new NamedArgument("--type", "box");
         typeArg.setType("string");
+        typeArg.setDescription("The type of object whose volume we want to calculate. Default is \"box\". (string)");
         String[] accepted = { "box", "ellipsoid", "pyramid" };
         typeArg.addAcceptedValues(accepted);
         parser.setNickname(typeArg, "-t");
 
         NamedArgument digitsArg = new NamedArgument("--digits", "4");
         digitsArg.setType("integer");
+        digitsArg.setDescription("An integer which has no effect on the volume calculation. (int)");
         parser.setNickname(digitsArg, "-d");
 
         parser.setFlags("-asx");

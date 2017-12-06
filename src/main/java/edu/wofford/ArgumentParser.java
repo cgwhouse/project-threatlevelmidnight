@@ -309,7 +309,7 @@ public class ArgumentParser {
                 parseNamed(arg, queue, encounteredMutex);
             } else if (arg.startsWith("-") && !arg.startsWith("--")) {
                 if (arg.length() > 2) {
-                    parseMultipleFlags(arg, msg);
+                    parseMultipleFlags(arg, msg, encounteredMutex);
                 } else {
                     parseShortform(arg, queue, encounteredMutex);
                 }
@@ -364,13 +364,15 @@ public class ArgumentParser {
         }
     }
 
-    private void parseMultipleFlags(String arg, String msg) {
+    private void parseMultipleFlags(String arg, String msg, List<String> mutex) {
         for (int i = 1; i < arg.length(); i++) {
             String name = "-" + Character.toString(arg.charAt(i));
             if (argumentMap.containsKey(name)) {
                 checkAndSet(argumentMap.get(name), "true");
+                checkForMutexEncounter(argumentMap.get(name), mutex);
             } else if (shortFormMap.containsKey(name)) {
                 checkAndSet(argumentMap.get(shortFormMap.get(name)), "true");
+                checkForMutexEncounter(argumentMap.get(shortFormMap.get(name)), mutex);
             } else {
                 msg += programName + ".java: error: unrecognized flag: " + name;
                 throw new UnrecognizedArgumentException(msg);
@@ -529,7 +531,6 @@ public class ArgumentParser {
                 encounteredMutuallyExclusiveNamedArgs.add(currentNamedArgument.getName());
             }
         }
-
     }
     //endregion
 
