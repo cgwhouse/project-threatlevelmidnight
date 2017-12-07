@@ -7,8 +7,10 @@ import java.util.*;
  * <p>
  * ArgumentParser is able to handle required arguments, named arguments and boolean flags.
  * Required arguments and named arguments can be of type string, integer, float, or boolean.
- * <pre>
+ * <p><strong>
  * Example 1:
+ * </strong>
+ * <pre>
  * {@code
  * private ArgumentParser parser;
  * parser = new ArgumentParser("Example 1 Program");
@@ -16,13 +18,15 @@ import java.util.*;
  * parser.setArguments(argumentNames);
  * parser.setArgumentValues(args);
  * }
+ * </pre>
  * In Example 1, we create an ArgumentParser for our program, "Example 1 Program".
  * We then specify the name of the arguments our program requires: "requiredArg1", "requiredArg2", "requriedArg3".
  * We then pass in the argument values from the user.
  * The user's values come via the execution of your program from the command line (args).
- * </pre>
- * <pre>
+ * <p><strong>
  * Example 2:
+ * </strong>
+ * <pre>
  * {@code
  * private ArgumentParser parser;
  * parser = new ArgumentParser("Example 2 Program");
@@ -33,15 +37,17 @@ import java.util.*;
  * parser.setArgument(argumentNames[2]);
  * parser.setArgumentValues(args);
  * }
+ * </pre>
  * In Example 2, we create an ArgumentParser for our program, "Example 2 Program".
  * We then specify the name of the arguments our program requires in two ways.
  * The first way is using an Argument object; we set one of the required arguments by creating an Argument object and passing it to setArgument.
  * The second way is using setArgument but we provide the string name of the argument.
  * We then pass in the argument values from the user.
  * The user's values come via the execution of your program from the command line (args).
- * </pre>
- * <pre>
+ * <p><strong>
  * Example 3:
+ * </strong>
+ * <pre>
  * {@code
  * private ArgumentParser parser;
  * parser = new ArgumentParser("Example 3 Program");
@@ -51,12 +57,12 @@ import java.util.*;
  * parser.setArgument(arg);
  * parser.setArgumentValues(args);
  * }
+ * </pre>
  * In Example 3, we create an ArgumentParser for our program, "Example 3 Program".
  * We then specify the name of the arguments our program requires by using setArguments.
  * We then pass in the NamedArgument object, "--type" with the default value of "ellipsoid".
  * The user's values come via the execution of your program from the command line (args).
  * If the user's values coming from the command line (args) do not specify the --type argument, then the default "ellipsoid" will be used in our program.
- * </pre>
  */
 public class ArgumentParser {
 
