@@ -14,6 +14,12 @@ public class ArgumentParserTest {
     parser = new ArgumentParser("VolumeCalculator");
   }
 
+  @After
+  public void cleanup() {
+      File file = new File("stripped_tmp.xml");
+      file.delete();
+  }
+
   @Test
   public void testProgramNameIsSet() {
     assertEquals("VolumeCalculator", parser.getProgramName());
@@ -383,7 +389,7 @@ public class ArgumentParserTest {
     parser.setNickname(typeArg, "-t");
     NamedArgument digitsArg = new NamedArgument("--digits", "4");
     digitsArg.setType("integer");
-    parser.setNickname(digitsArg, "-d");
+    parser.setArgument(digitsArg);
     parser.createXML(true, true);
     ArgumentParser receiver = new ArgumentParser("VolumeCalculator");
     File file = new File("stripped_tmp.xml");
@@ -394,15 +400,6 @@ public class ArgumentParserTest {
     assertEquals("float", receiver.getType("width"));
     assertEquals("ellipsoid", receiver.getValue("--type"));
     assertEquals("4", receiver.getValue("--digits"));
-    // File file = new File("src/test/resources/testXMLParser.xml");
-    // String[] argumentValues = { "7", "5", "-t", "ellipsoid", "2" };
-    // parser.parseXML(file.getAbsolutePath());
-    // parser.setArgumentValues(argumentValues);
-    // assertEquals("7", parser.getValue("length"));
-    // assertEquals("float", parser.getType("width"));
-    // assertEquals("ellipsoid", parser.getValue("--type"));
-    // assertEquals("4", parser.getValue("-d"));
-
   }
 
   @Test
