@@ -11,7 +11,7 @@ import java.util.*;
  * integer, float, or boolean.
  * <p>
  * <strong> Example 1: </strong>
- * 
+ *
  * <pre>
  * {
  * 	&#64;code
@@ -22,7 +22,7 @@ import java.util.*;
  * 	parser.setArgumentValues(args);
  * }
  * </pre>
- * 
+ *
  * In Example 1, we create an ArgumentParser for our program, "Example 1
  * Program". We then specify the name of the arguments our program requires:
  * "requiredArg1", "requiredArg2", "requriedArg3". We then pass in the argument
@@ -30,7 +30,7 @@ import java.util.*;
  * program from the command line (args).
  * <p>
  * <strong> Example 2: </strong>
- * 
+ *
  * <pre>
  * {
  * 	&#64;code
@@ -44,7 +44,7 @@ import java.util.*;
  * 	parser.setArgumentValues(args);
  * }
  * </pre>
- * 
+ *
  * In Example 2, we create an ArgumentParser for our program, "Example 2
  * Program". We then specify the name of the arguments our program requires in
  * two ways. The first way is using an Argument object; we set one of the
@@ -55,7 +55,7 @@ import java.util.*;
  * (args).
  * <p>
  * <strong> Example 3: </strong>
- * 
+ *
  * <pre>
  * {
  * 	&#64;code
@@ -68,7 +68,7 @@ import java.util.*;
  * 	parser.setArgumentValues(args);
  * }
  * </pre>
- * 
+ *
  * In Example 3, we create an ArgumentParser for our program, "Example 3
  * Program". We then specify the name of the arguments our program requires by
  * using setArguments. We then pass in the NamedArgument object, "--type" with
@@ -89,7 +89,7 @@ public class ArgumentParser {
 	/**
 	 * Constructs an ArgumentParser object which requires the program name as a
 	 * string.
-	 * 
+	 *
 	 * @param programName
 	 *            the name of the program
 	 */
@@ -106,7 +106,7 @@ public class ArgumentParser {
 	/**
 	 * Sets the name of the program. This will change the program name from the
 	 * default that is set with the constructor.
-	 * 
+	 *
 	 * @param name
 	 *            the new name of the program as a string
 	 */
@@ -116,7 +116,7 @@ public class ArgumentParser {
 
 	/**
 	 * Sets the description of the program.
-	 * 
+	 *
 	 * @param description
 	 *            the description of the program as a string
 	 */
@@ -127,7 +127,7 @@ public class ArgumentParser {
 	/**
 	 * Sets the names of the arguments. For each name in the array, an argument is
 	 * created. Note the argument <strong>"-h"</strong> is not allowed.
-	 * 
+	 *
 	 * @param names
 	 *            an array of names as strings
 	 */
@@ -144,7 +144,7 @@ public class ArgumentParser {
 	/**
 	 * Sets one argument. Given a name, an argument is created and set. Note the
 	 * argument <strong>"-h"</strong> is not allowed.
-	 * 
+	 *
 	 * @param name
 	 *            the desired name of the argument as string
 	 */
@@ -159,7 +159,7 @@ public class ArgumentParser {
 	/**
 	 * Sets one argument. The given argument is set for the parser. Note the
 	 * argument with name <strong>"-h"</strong> is not allowed.
-	 * 
+	 *
 	 * @param arg
 	 *            the Argument object to be set
 	 * @see Argument
@@ -181,7 +181,7 @@ public class ArgumentParser {
 	 * argument object has already been created with its attributes (e.g. type,
 	 * default value, description) set as desired. The method should be used when an
 	 * Argument object has been fully defined and is ready to be given a nickname.
-	 * 
+	 *
 	 * @param arg
 	 *            Argument object to be given an alias and then set as an argument
 	 *            for the parser
@@ -206,7 +206,7 @@ public class ArgumentParser {
 	/**
 	 * Sets an argument's description. The argument to be modified must already be
 	 * known by the ArgumentParser.
-	 * 
+	 *
 	 * @param name
 	 *            the name of the argument whose description we want to set
 	 * @param description
@@ -220,7 +220,7 @@ public class ArgumentParser {
 	/**
 	 * Sets an argument's type. The argument to be modified must already be known by
 	 * the ArgumentParser.
-	 * 
+	 *
 	 * @param name
 	 *            the name of the argument whose type we want to set
 	 * @param typeName
@@ -236,7 +236,7 @@ public class ArgumentParser {
 	 * string starting with "-". Each flag's initial value will be set to false, and
 	 * flags that are set using this method will only be accessible via the
 	 * short-form name (e.g. "-a") that is provided in the parameter.
-	 * 
+	 *
 	 * @param flag
 	 *            a string starting with "-" and followed by any number of
 	 *            characters, each of which will be a new flag to be recognized by
@@ -257,7 +257,7 @@ public class ArgumentParser {
 
 	/**
 	 * Gets the name of the program whose arguments the ArgumentParser is parsing.
-	 * 
+	 *
 	 * @return the name of the program
 	 */
 	public String getProgramName() {
@@ -283,7 +283,7 @@ public class ArgumentParser {
 
 	/**
 	 * Gets the values of the argument with the associated name.
-	 * 
+	 *
 	 * @param name
 	 *            the name of the argument whose values are wanted
 	 * @return a list of string representations of the argument's values
@@ -307,7 +307,7 @@ public class ArgumentParser {
 
 	/**
 	 * Gets the type of the argument with the associated name.
-	 * 
+	 *
 	 * @param name
 	 *            the name of the argument whose type is wanted
 	 * @return string representation of the argument's type
@@ -326,7 +326,7 @@ public class ArgumentParser {
 	 * Parses the values taken from the command line and sets them to their
 	 * respective arguments. If the value "-h" or "--help" is detected, a help
 	 * message will be displayed to the user.
-	 * 
+	 *
 	 * @param values
 	 *            string of values from the command line
 	 * @throws UnrecognizedArgumentException
@@ -371,8 +371,7 @@ public class ArgumentParser {
 			}
 		}
 		if (positionalIndex < positionalArgs.size()) {
-			msg += programName + ".java: error: the following arguments are required: "
-					+ positionalArgs.get(positionalIndex);
+			msg += programName + ".java: error: the following arguments are required: " + positionalArgs.get(positionalIndex);
 			throw new MissingRequiredArgumentException(msg);
 		}
 		parseRequired(msg);
@@ -382,7 +381,7 @@ public class ArgumentParser {
 	/**
 	 * Reads argument information from an XML file and adds them to the
 	 * ArgumentParser object's known arguments.
-	 * 
+	 *
 	 * @param filename
 	 *            the name of the file to read from
 	 */
@@ -393,14 +392,27 @@ public class ArgumentParser {
 	/**
 	 * Creates a string that contains all of the parser's argument information,
 	 * formatted as XML.
-	 * 
-	 * @param createFile
-	 *            if true, XML string is written to a newly created file in the
-	 *            current directory
+	 *
+	 * @param createFile if true, XML string is written to a newly created file in
+	 * 								   the current directory
 	 * @return string of parser's argument information formatted as XML
 	 */
 	public String createXML(boolean createFile) {
 		return XML.createXML(createFile, positionalArgs, namedArgs, argumentMap);
+	}
+
+	/**
+	* Creates a string that contains all of the parser's argument information,
+	* formatted as XML.
+	*
+	* @param createFile if true, XML string is written to a newly created file in
+	* 									the current directory
+	* @param keepTemp   if true, the program will create the file as tmp.xml
+	*										instead of giving it a unique filename
+	* @return string of parser's argument information formatted as XML
+	*/
+	public String createXML(boolean createFile, boolean keepTemp) {
+		return XML.createXML(createFile, keepTemp, positionalArgs, namedArgs, argumentMap);
 	}
 
 	// region Private Methods
@@ -510,8 +522,8 @@ public class ArgumentParser {
 			current.setValue(value);
 		} else {
 			String msg = makeUsageMessage();
-			msg += programName + ".java: error: argument " + current.getName() + ": invalid " + current.getType()
-					+ " value: " + value;
+			msg += programName + ".java: error: argument " + current.getName() + ": invalid " + current.getType() + " value: "
+					+ value;
 			throw new InvalidTypeException(msg);
 		}
 	}
@@ -554,11 +566,10 @@ public class ArgumentParser {
 				if (mutuallyExclusiveNamedArgs.size() == 0) {
 					mutuallyExclusiveNamedArgs.add(arg.getName());
 				} else {
-					String mutuallyExclusiveArgConflict = checkMutuallyExclusiveNamedArgs(mutuallyExclusiveNamedArgs,
-							arg);
+					String mutuallyExclusiveArgConflict = checkMutuallyExclusiveNamedArgs(mutuallyExclusiveNamedArgs, arg);
 					if (!mutuallyExclusiveArgConflict.equals("")) {
-						msg += programName + ".java: error: the following arguments are mutually exclusive: " + name
-								+ " and " + mutuallyExclusiveArgConflict;
+						msg += programName + ".java: error: the following arguments are mutually exclusive: " + name + " and "
+								+ mutuallyExclusiveArgConflict;
 						throw new MutuallyExclusiveArgumentException(msg);
 					}
 				}
